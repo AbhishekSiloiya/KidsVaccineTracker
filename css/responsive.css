@@ -1,98 +1,295 @@
-/* Responsive design for VaccinationTracker */
+/* Responsive design for VaccinationTracker - Sleek & Space Optimized */
 
 /* Mobile devices (up to 640px) */
 @media (max-width: 640px) {
-  /* Overall page spacing */
+  /* Overall page spacing - Ultra compact */
   body {
-    padding-top: 1rem !important;
-    padding-bottom: 1rem !important;
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
   }
   
-  /* Header optimization */
+  /* Header optimization - Minimal space */
   header {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.75rem !important;
   }
   
   h1 {
-    font-size: 1.75rem !important;
-    line-height: 1.2 !important;
-  }
-  
-  header p {
-    font-size: 0.875rem !important;
-    margin-top: 0.5rem !important;
-  }
-  
-  /* Container padding */
-  .max-w-3xl {
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
-  }
-  
-  /* Card improvements */
-  .combined-card {
-    padding: 1rem !important;
-    margin: 0 0.5rem 1rem !important;
-    border-radius: 12px !important;
-  }
-  
-  .schedule-card {
-    padding: 0.75rem !important;
-    margin: 0 0.5rem 0.75rem !important;
-  }
-  
-  /* Form layout */
-  .flex.flex-col.sm\\:flex-row {
-    flex-direction: column !important;
-    gap: 1rem !important;
-  }
-  
-  /* Input fields */
-  input[type="text"], input[type="date"] {
-    min-height: 48px !important;
-    font-size: 16px !important; /* Prevents iOS zoom */
-    padding: 0.75rem !important;
-  }
-  
-  /* Labels */
-  label {
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
+    font-size: 1.5rem !important;
+    line-height: 1.1 !important;
     margin-bottom: 0.25rem !important;
   }
   
-  /* Button improvements */
-  .flex.gap-2 {
+  header p {
+    font-size: 0.75rem !important;
+    margin-top: 0.25rem !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* Container padding - Tighter */
+  .max-w-3xl {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+  
+  /* Card improvements - Compact */
+  .combined-card {
+    padding: 0.75rem !important;
+    margin: 0 0.25rem 0.75rem !important;
+    border-radius: 8px !important;
+  }
+  
+  .schedule-card {
+    padding: 0.5rem !important;
+    margin: 0 0.25rem 0.5rem !important;
+    border-radius: 8px !important;
+  }
+  
+  /* Form layout - Stacked and compact */
+  .flex.flex-col.sm\\:flex-row {
     flex-direction: column !important;
     gap: 0.75rem !important;
+  }
+  
+  /* Input fields - Optimized */
+  input[type="text"], input[type="date"] {
+    min-height: 40px !important;
+    font-size: 16px !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Labels - Compact */
+  label {
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.2rem !important;
+  }
+  
+  /* Button improvements - Full width, compact */
+  .flex.gap-2 {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
     width: 100% !important;
   }
   
   button {
-    min-height: 44px !important; /* iOS touch target minimum */
-    padding: 0.75rem 1rem !important;
-    font-size: 1rem !important;
+    min-height: 40px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.9rem !important;
     width: 100% !important;
-    border-radius: 8px !important;
+    border-radius: 6px !important;
     font-weight: 600 !important;
   }
   
-  /* Read-only view improvements */
+  /* Read-only view improvements - Sleek layout */
   .flex.items-center.justify-between {
     flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 1rem !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
   }
   
   .flex.items-center.gap-2.flex-wrap {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 0.25rem !important;
+    width: 100% !important;
   }
   
   .flex.items-center.gap-2 {
     width: 100% !important;
-    justify-content: space-between !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    align-items: stretch !important;
+  }
+  
+  #downloadCalendarBtn {
+    width: 100% !important;
+    margin-right: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+  
+  #editBtn {
+    align-self: flex-end !important;
+    width: auto !important;
+    min-width: 40px !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Country info positioning - Compact */
+  .absolute.top-4.right-4 {
+    position: static !important;
+    margin-bottom: 0.5rem !important;
+    text-align: center !important;
+    font-size: 0.75rem !important;
+  }
+  
+  /* Error message - Compact */
+  .error-text {
+    font-size: 0.8rem !important;
+    margin-top: 0.25rem !important;
+  }
+  
+  /* Schedule card improvements - Ultra compact */
+  .schedule-card .flex.items-center.justify-between {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.5rem !important;
+  }
+  
+  .schedule-card .flex.items-center.gap-2 {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+    width: 100% !important;
+  }
+  
+  /* Vaccine text wrapping - Compact display */
+  .text-xs.text-gray-700.whitespace-nowrap.hidden.sm\\:block {
+    white-space: normal !important;
+    display: block !important;
+    font-size: 0.7rem !important;
+    line-height: 1.3 !important;
+    margin-top: 0.25rem !important;
+    color: #6b7280 !important;
+  }
+  
+  /* Child info text improvements - Compact */
+  .flex.items-center.gap-2.flex-wrap p {
+    font-size: 0.8rem !important;
+  }
+  
+  .flex.items-center.gap-2.flex-wrap span {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Status badges - Compact */
+  .status-due, .status-upcoming, .status-completed {
+    font-size: 0.65rem !important;
+    padding: 0.2rem 0.4rem !important;
+    min-width: 4.5rem !important;
+  }
+  
+  /* Card details - Compact */
+  .schedule-card .card-details {
+    padding-top: 0.5rem !important;
+  }
+  
+  .schedule-card .card-details p {
+    font-size: 0.8rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .schedule-card .card-details ul {
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .schedule-card .card-details li {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.1rem !important;
+  }
+  
+  /* Button spacing in cards */
+  .schedule-card .mark-btn {
+    margin-top: 0.5rem !important;
+    width: 100% !important;
+    text-align: center !important;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  /* Form spacing in cards */
+  .schedule-card .complete-form {
+    margin-top: 0.5rem !important;
+  }
+  
+  .schedule-card .complete-form input {
+    width: 100% !important;
+    margin-bottom: 0.25rem !important;
+    padding: 0.4rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  .schedule-card .complete-form button {
+    width: 100% !important;
+    padding: 0.4rem 0.6rem !important;
+    font-size: 0.8rem !important;
+  }
+  
+  /* Welcome text - Compact */
+  .combined-card h2 {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .combined-card p {
+    font-size: 0.85rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* Extra small screens (up to 480px) - Ultra compact */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.25rem !important;
+  }
+  
+  .combined-card {
+    padding: 0.5rem !important;
+    margin: 0 0.125rem 0.5rem !important;
+  }
+  
+  .schedule-card {
+    padding: 0.375rem !important;
+    margin: 0 0.125rem 0.375rem !important;
+  }
+  
+  /* Stack download and edit buttons */
+  .flex.items-center.gap-2 {
+    flex-direction: column !important;
+    gap: 0.375rem !important;
+  }
+  
+  #downloadCalendarBtn {
+    margin-right: 0 !important;
+    width: 100% !important;
+    padding: 0.6rem !important;
+  }
+  
+  #editBtn {
+    align-self: flex-end !important;
+    padding: 0.4rem !important;
+  }
+  
+  /* Improve vaccine text on very small screens */
+  .text-xs.text-gray-700.whitespace-nowrap.hidden.sm\\:block {
+    font-size: 0.65rem !important;
+  }
+  
+  /* Ultra compact status badges */
+  .status-due, .status-upcoming, .status-completed {
+    font-size: 0.6rem !important;
+    padding: 0.15rem 0.3rem !important;
+    min-width: 4rem !important;
+  }
+}
+
+/* Medium screens (641px to 768px) - Balanced */
+@media (min-width: 641px) and (max-width: 768px) {
+  .combined-card {
+    padding: 1.25rem !important;
+  }
+  
+  .schedule-card {
+    padding: 0.75rem !important;
+  }
+  
+  /* Better button layout for medium screens */
+  .flex.items-center.gap-2 {
+    flex-direction: row !important;
+    gap: 0.75rem !important;
   }
   
   #downloadCalendarBtn {
@@ -100,54 +297,22 @@
     margin-right: 0.5rem !important;
   }
   
-  /* Country info positioning */
-  .absolute.top-4.right-4 {
-    position: static !important;
-    margin-bottom: 1rem !important;
-    text-align: center !important;
-  }
-  
-  /* Error message */
-  .error-text {
-    font-size: 0.875rem !important;
-    margin-top: 0.5rem !important;
-  }
-}
-
-/* Extra small screens (up to 480px) */
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.5rem !important;
-  }
-  
-  .combined-card {
-    padding: 0.75rem !important;
-    margin: 0 0.25rem 0.75rem !important;
-  }
-  
-  .schedule-card {
-    padding: 0.5rem !important;
-    margin: 0 0.25rem 0.5rem !important;
-  }
-  
-  /* Stack download and edit buttons */
-  .flex.items-center.gap-2 {
-    flex-direction: column !important;
-    gap: 0.5rem !important;
-  }
-  
-  #downloadCalendarBtn {
-    margin-right: 0 !important;
-    width: 100% !important;
-  }
-  
   #editBtn {
-    align-self: flex-end !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Balanced typography */
+  h1 {
+    font-size: 2rem !important;
+  }
+  
+  header p {
+    font-size: 0.9rem !important;
   }
 }
 
-/* Tablet devices (641px to 1024px) */
-@media (min-width: 641px) and (max-width: 1024px) {
+/* Tablet devices (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
   .combined-card {
     padding: 1.75rem;
   }
@@ -156,7 +321,6 @@
     max-width: 90%;
   }
   
-  /* Improve button layout on tablets */
   .flex.gap-2 {
     gap: 0.5rem !important;
   }
