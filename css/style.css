@@ -1,0 +1,121 @@
+/* Custom styles for VaccinationTracker */
+body { 
+  font-family: 'Inter', sans-serif; 
+}
+
+.gradient-bg { 
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+}
+
+/* Combined card for welcome and input */
+.combined-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto 1.5rem;
+  transition: box-shadow .3s;
+  position: relative;
+}
+
+.combined-card:hover {
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+/* Schedule cards styling */
+.schedule-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: box-shadow .3s;
+  padding: 0.75rem 1.25rem;
+  max-width: 800px;
+  margin: 0 auto 1rem;
+}
+
+.schedule-card:hover {
+  box-shadow: 0 8px 12px rgba(0,0,0,0.1);
+}
+
+/* Status badges */
+.status-due, .status-upcoming, .status-completed { 
+  display: inline-block; 
+  min-width: 5.5rem; 
+  text-align: center; 
+  padding: 0.3rem 0.6rem; 
+  border-radius: 9999px; 
+  font-size: 0.7rem; 
+  font-weight: 600; 
+}
+
+.status-due { 
+  background: #fee2e2; 
+  color: #b91c1c; 
+}
+
+.status-upcoming { 
+  background: #fef9c3; 
+  color: #a16207; 
+}
+
+.status-completed { 
+  background: #dcfce7; 
+  color: #15803d; 
+}
+
+/* Expandable card details */
+.card-details { 
+  max-height: 0; 
+  overflow: hidden; 
+  transition: max-height .5s ease-in-out; 
+}
+
+.schedule-card.expanded .card-details { 
+  max-height: 400px; 
+  padding-top: 0.75rem; 
+}
+
+.expand-icon { 
+  cursor: pointer; 
+  transition: transform .3s; 
+}
+
+.schedule-card.expanded .expand-icon { 
+  transform: rotate(180deg); 
+}
+
+/* Error styling */
+.error-text { 
+  color: #dc2626; 
+  font-size: 0.875rem; 
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+} 
