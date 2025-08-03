@@ -17,6 +17,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ GitHub Actions workflow for automated testing
 
 ### Changed
+- 🎯 **Major Mobile UI Improvements**:
+  - Reduced header space and optimized typography for mobile
+  - Full-width buttons with 44px minimum touch targets
+  - Improved form layout with better spacing
+  - Enhanced button stacking on mobile devices
+  - Better input field sizing (48px height, 16px font)
+  - Optimized card padding and margins for mobile
+  - Improved read-only view layout on small screens
+  - Added extra small screen support (up to 480px)
+  - Better country info positioning on mobile
+  - Enhanced error message styling
 - Improved error handling in validation
 - Enhanced responsive design for mobile devices
 
@@ -97,6 +108,17 @@ When adding new features or fixing bugs:
    - Bug fix description
    
    ### Changed
+- 🎯 **Major Mobile UI Improvements**:
+  - Reduced header space and optimized typography for mobile
+  - Full-width buttons with 44px minimum touch targets
+  - Improved form layout with better spacing
+  - Enhanced button stacking on mobile devices
+  - Better input field sizing (48px height, 16px font)
+  - Optimized card padding and margins for mobile
+  - Improved read-only view layout on small screens
+  - Added extra small screen support (up to 480px)
+  - Better country info positioning on mobile
+  - Enhanced error message styling
    - Breaking change description
    ```
 
