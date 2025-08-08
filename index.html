@@ -6,16 +6,20 @@
   <title>VaccinationTracker - Child Vaccination Schedule</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/style.css?v=3">
+  <link rel="stylesheet" href="css/responsive.css?v=3">
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#3b82f6">
   <meta name="description" content="Track your child's vaccination schedule with ease">
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="assets/images/icon-192.png">
+  <link rel="icon" type="image/png" href="assets/images/icon-192.png">
 </head>
 <body class="gradient-bg min-h-screen py-8">
   <div class="max-w-3xl mx-auto px-4">
+    <div id="topActions" class="flex items-center justify-end mb-4">
+      <button id="manageProfilesBtn" class="bg-gray-100 text-gray-800 px-3 py-2 rounded-md hover:bg-gray-200 text-sm">Manage Profiles</button>
+    </div>
     <header class="text-center mb-8">
       <h1 class="text-4xl font-bold text-gray-800">Child Vaccination Tracker</h1>
       <p class="text-gray-600 mt-2 text-lg">Based on IAP 2024 Schedule</p>
@@ -82,6 +86,40 @@
 
     <!-- Schedule Output -->
     <div id="scheduleOutput" class="space-y-4"></div>
+
+    <!-- Profiles Dashboard -->
+    <div id="profilesDashboard" class="hidden dashboard">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-bold text-gray-800">Children Schedule</h2>
+        <div class="flex items-center gap-2">
+          <button id="addChildBtn" class="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm">Add Child</button>
+          <button id="backToScheduleBtn" class="bg-gray-100 text-gray-800 px-3 py-2 rounded-md hover:bg-gray-200 text-sm">Back</button>
+        </div>
+      </div>
+
+      <!-- Stats overview -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Total Children</div>
+          <div id="statTotal" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Completed</div>
+          <div id="statCompleted" class="stat-value">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Overdue</div>
+          <div id="statOverdue" class="stat-value text-red-600">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Upcoming</div>
+          <div id="statUpcoming" class="stat-value text-blue-600">0</div>
+        </div>
+      </div>
+
+      <!-- Profiles list -->
+      <div id="profilesList" class="space-y-2"></div>
+    </div>
   </div>
 
   <!-- Loading Spinner -->

@@ -363,3 +363,66 @@
     padding-top: 0.75rem !important;
   }
 }
+
+/* Minimal mobile overrides (placed last to win cascade) */
+@media (max-width: 640px) {
+  /* Flatten background for minimal look */
+  .gradient-bg { background: #f8fafc !important; }
+
+  /* Cards: flatter, tighter, bordered */
+  .combined-card,
+  .schedule-card {
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb !important; /* gray-200 */
+    border-radius: 6px !important;
+  }
+
+  .combined-card {
+    padding: 0.5rem !important;
+    margin: 0 0.25rem 0.5rem !important;
+  }
+
+  .schedule-card {
+    padding: 0.375rem 0.5rem !important;
+    margin: 0 0.25rem 0.375rem !important;
+  }
+
+  /* Typography tweaks */
+  h1 { font-size: 1.35rem !important; line-height: 1.15 !important; }
+  .combined-card h2 { font-size: 1.25rem !important; margin-bottom: 0.2rem !important; }
+  .combined-card p { font-size: 0.8rem !important; margin-bottom: 0.4rem !important; }
+
+  /* Vaccine list line */
+  .text-xs.text-gray-700.whitespace-nowrap.hidden.sm\:block {
+    font-size: 0.65rem !important;
+  }
+
+  /* Subtext lines */
+  .due-date, .completed-date { font-size: 0.65rem !important; }
+
+  /* Buttons */
+  button {
+    min-height: 36px !important;
+    padding: 0.4rem 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  /* Badges */
+  .status-due, .status-upcoming, .status-completed {
+    font-size: 0.6rem !important;
+    padding: 0.15rem 0.35rem !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 { font-size: 1.15rem !important; }
+  .combined-card { padding: 0.4rem !important; margin: 0 0.125rem 0.4rem !important; }
+  .schedule-card { padding: 0.3rem !important; margin: 0 0.125rem 0.3rem !important; }
+
+  .status-due, .status-upcoming, .status-completed {
+    font-size: 0.58rem !important;
+    padding: 0.12rem 0.28rem !important;
+    min-width: 0 !important;
+  }
+}
