@@ -144,96 +144,117 @@ class VaccinationTracker {
   }
 
   // Render profiles list
-  /* eslint-disable-next-line max-lines-per-function */
   renderProfilesDashboard() {
     if (!this.profilesList) {return;}
     const children = window.vaccinationStorage.getAllChildren();
     this.profilesList.innerHTML = '';
-    // Update stats
-    const totalEl = document.getElementById('statTotal');
-    const completedEl = document.getElementById('statCompleted');
-    const overdueEl = document.getElementById('statOverdue');
-    const upcomingEl = document.getElementById('statUpcoming');
+
+    const { totalEl, completedEl, overdueEl, upcomingEl } = this.getDashboardStatElements();
     if (totalEl) { totalEl.textContent = String(children.length); }
-    if (completedEl || overdueEl || upcomingEl) {
-      let completed = 0; let overdue = 0; let upcoming = 0;
-      children.forEach((child) => {
-        const stats = this.computeMilestoneStatsForChild(child);
-        completed += stats.milestonesCompleted;
-        overdue += stats.overdueCount;
-        upcoming += stats.upcomingCount;
-      });
-      if (completedEl) { completedEl.textContent = String(completed); }
-      if (overdueEl) { overdueEl.textContent = String(overdue); }
-      if (upcomingEl) { upcomingEl.textContent = String(upcoming); }
-    }
+
     if (children.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'text-sm text-gray-600 p-3';
-      empty.textContent = 'No profiles yet. Add a child to get started.';
-      this.profilesList.appendChild(empty);
+      this.renderEmptyProfilesMessage();
+      const zeroTotals = { completed: 0, overdue: 0, upcoming: 0 };
+      this.updateDashboardStatsTotals(zeroTotals, { completedEl, overdueEl, upcomingEl });
       return;
     }
-    /* eslint-disable-next-line max-lines-per-function */
+
+    const totals = { completed: 0, overdue: 0, upcoming: 0 };
     children.forEach((child) => {
       const stats = this.computeMilestoneStatsForChild(child);
-      const {
-        ageString,
-        overdueCount,
-        dueSoonCount,
-        milestonesCompleted,
-        totalMilestones,
-        nextDueDate,
-        nextDueLabel
-      } = stats;
+      totals.completed += stats.milestonesCompleted;
+      totals.overdue += stats.overdueCount;
+      totals.upcoming += stats.upcomingCount;
 
-      const row = document.createElement('div');
-      row.className = 'profile-card';
-      row.innerHTML = `
-        <div class="flex-1">
-          <div class="flex items-center justify-between gap-2 flex-wrap">
-            <div class="flex items-center gap-2">
-              <span class="font-semibold text-gray-800 text-base">${child.name}</span>
-              <span class="text-sm text-gray-600">Born ${new Date(child.dob).toLocaleDateString('en-IN')}</span>
-              <span class="text-sm text-gray-600">• ${ageString}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="pill pill-red">${overdueCount} Overdue</span>
-              <span class="pill pill-yellow">${dueSoonCount} Due Soon</span>
-              <span class="pill pill-green">${milestonesCompleted}/${totalMilestones} Complete</span>
-            </div>
-          </div>
-          <div class="mt-3 bg-blue-50 text-blue-900 rounded-md p-3">
-            <div class="text-sm font-semibold">Next Due:</div>
-            <div class="text-base">${nextDueDate ? nextDueLabel : 'All done'}</div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 ml-3">
-          <button class="view-btn bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-xs hover:bg-gray-200">View</button>
-          <button class="delete-btn bg-red-600 text-white px-3 py-1 rounded-md text-xs hover:bg-red-700">Delete</button>
-        </div>
-      `;
+      const row = this.buildProfileRow(child, stats);
       this.profilesList.appendChild(row);
+      this.attachProfileRowHandlers(row, child);
+    });
 
-      row.querySelector('.view-btn').addEventListener('click', () => {
-        this.hideDashboard();
-        this.loadChildData(child);
-      });
+    this.updateDashboardStatsTotals(totals, { completedEl, overdueEl, upcomingEl });
+  }
 
-      row.querySelector('.delete-btn').addEventListener('click', () => {
-        // eslint-disable-next-line no-alert
-        const ok = window.confirm(`Delete profile for ${child.name}? This cannot be undone.`);
-        if (!ok) {return;}
-        window.vaccinationStorage.deleteChild(child.id, { includeVaccinationData: true });
-        // If deleting the current child, reset the UI
-        if (this.currentChild && this.currentChild.id === child.id) {
-          this.currentChild = null;
-          this.scheduleOutput.innerHTML = '';
-          this.readOnlyView.classList.add('hidden');
-          this.editableView.classList.remove('hidden');
-        }
-        this.renderProfilesDashboard();
-      });
+  getDashboardStatElements() {
+    return {
+      totalEl: document.getElementById('statTotal'),
+      completedEl: document.getElementById('statCompleted'),
+      overdueEl: document.getElementById('statOverdue'),
+      upcomingEl: document.getElementById('statUpcoming')
+    };
+  }
+
+  updateDashboardStatsTotals(totals, els) {
+    const { completedEl, overdueEl, upcomingEl } = els;
+    if (completedEl) { completedEl.textContent = String(totals.completed); }
+    if (overdueEl) { overdueEl.textContent = String(totals.overdue); }
+    if (upcomingEl) { upcomingEl.textContent = String(totals.upcoming); }
+  }
+
+  renderEmptyProfilesMessage() {
+    const empty = document.createElement('div');
+    empty.className = 'text-sm text-gray-600 p-3';
+    empty.textContent = 'No profiles yet. Add a child to get started.';
+    this.profilesList.appendChild(empty);
+  }
+
+  buildProfileRow(child, stats) {
+    const {
+      ageString,
+      overdueCount,
+      dueSoonCount,
+      milestonesCompleted,
+      totalMilestones,
+      nextDueDate,
+      nextDueLabel
+    } = stats;
+
+    const row = document.createElement('div');
+    row.className = 'profile-card';
+    row.innerHTML = `
+      <div class="flex-1">
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-800 text-base">${child.name}</span>
+            <span class="text-sm text-gray-600">Born ${new Date(child.dob).toLocaleDateString('en-IN')}</span>
+            <span class="text-sm text-gray-600">• ${ageString}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="pill pill-red">${overdueCount} Overdue</span>
+            <span class="pill pill-yellow">${dueSoonCount} Due Soon</span>
+            <span class="pill pill-green">${milestonesCompleted}/${totalMilestones} Complete</span>
+          </div>
+        </div>
+        <div class="mt-3 bg-blue-50 text-blue-900 rounded-md p-3">
+          <div class="text-sm font-semibold">Next Due:</div>
+          <div class="text-base">${nextDueDate ? nextDueLabel : 'All done'}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 ml-3">
+        <button class="view-btn bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-xs hover:bg-gray-200">View</button>
+        <button class="delete-btn bg-red-600 text-white px-3 py-1 rounded-md text-xs hover:bg-red-700">Delete</button>
+      </div>
+    `;
+    return row;
+  }
+
+  attachProfileRowHandlers(row, child) {
+    row.querySelector('.view-btn').addEventListener('click', () => {
+      this.hideDashboard();
+      this.loadChildData(child);
+    });
+
+    row.querySelector('.delete-btn').addEventListener('click', () => {
+      // eslint-disable-next-line no-alert
+      const ok = window.confirm(`Delete profile for ${child.name}? This cannot be undone.`);
+      if (!ok) {return;}
+      window.vaccinationStorage.deleteChild(child.id, { includeVaccinationData: true });
+      if (this.currentChild && this.currentChild.id === child.id) {
+        this.currentChild = null;
+        this.scheduleOutput.innerHTML = '';
+        this.readOnlyView.classList.add('hidden');
+        this.editableView.classList.remove('hidden');
+      }
+      this.renderProfilesDashboard();
     });
   }
 
@@ -252,17 +273,18 @@ class VaccinationTracker {
   }
 
   // Compute milestone stats for a child used by both pages to stay in sync
-  /* eslint-disable-next-line max-lines-per-function */
   computeMilestoneStatsForChild(child) {
-    const dueSoonDays = 30;
     const dob = new Date(child.dob);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-
     const vaccinationData = window.vaccinationStorage.getVaccinationData(child.id);
     const completions = vaccinationData.completions || {};
+    const stats = this.computeScheduleStats(dob, completions, today);
+    return { ageString: this.formatAgeString(dob, today), ...stats };
+  }
 
-    const totalMilestones = vaccinationSchedule.length;
+  computeScheduleStats(dob, completions, today) {
+    const dueSoonDays = 30;
     let milestonesCompleted = 0;
     let overdueCount = 0;
     let dueSoonCount = 0;
@@ -270,37 +292,34 @@ class VaccinationTracker {
     let nextDueLabel = 'All caught up';
     let nextDueDate = null;
 
-    const isMilestoneCompleted = (ageLabel, vaccines) => {
-      const completedForAge = completions[ageLabel] || {};
-      return vaccines.every((v) => Boolean(completedForAge[v]));
-    };
-
     vaccinationSchedule.forEach((item) => {
       const due = this.calcDate(dob, item.age);
       due.setHours(0, 0, 0, 0);
 
-      if (isMilestoneCompleted(item.age, item.vaccines)) {
+      const completedForAge = completions[item.age] || {};
+      const isCompleted = item.vaccines.every((v) => Boolean(completedForAge[v]));
+      if (isCompleted) {
         milestonesCompleted += 1;
         return;
       }
 
       if (due < today) {
         overdueCount += 1;
-      } else {
-        upcomingCount += 1;
-        const daysUntil = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-        if (daysUntil <= dueSoonDays) { dueSoonCount += 1; }
-        if (!nextDueDate || due < nextDueDate) {
-          nextDueDate = due;
-          nextDueLabel = `${item.vaccines[0]} - ${due.toLocaleDateString('en-IN')}`;
-        }
+        return;
+      }
+
+      upcomingCount += 1;
+      const daysUntil = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+      if (daysUntil <= dueSoonDays) { dueSoonCount += 1; }
+      if (!nextDueDate || due < nextDueDate) {
+        nextDueDate = due;
+        nextDueLabel = `${item.vaccines[0]} - ${due.toLocaleDateString('en-IN')}`;
       }
     });
 
     return {
-      ageString: this.formatAgeString(dob, today),
       milestonesCompleted,
-      totalMilestones,
+      totalMilestones: vaccinationSchedule.length,
       overdueCount,
       dueSoonCount,
       upcomingCount,
@@ -356,79 +375,81 @@ class VaccinationTracker {
   }
 
   // Render the vaccination schedule
-  /* eslint-disable-next-line max-lines-per-function */
   renderSchedule(dobDate) {
     this.scheduleOutput.innerHTML = '';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    /* eslint-disable-next-line max-lines-per-function */
     vaccinationSchedule.forEach(item => {
       const dueDate = this.calcDate(dobDate, item.age);
       dueDate.setHours(0, 0, 0, 0);
 
-      // Determine completion state from storage
       const completionMap = window.vaccinationStorage.getVaccinationData(this.currentChild.id).completions || {};
       const completedForAge = completionMap[item.age] || {};
       const isCompleted = item.vaccines.every(v => Boolean(completedForAge[v]));
-
-      let statusClass = 'status-upcoming';
-      let statusText = 'Upcoming';
-      if (isCompleted) {
-        statusClass = 'status-completed';
-        statusText = 'Completed';
-      } else if (dueDate < today) {
-        statusClass = 'status-due';
-        statusText = 'Due / Overdue';
-      }
-
-      const card = document.createElement('div');
-      card.className = 'schedule-card fade-in';
-
-      card.innerHTML = `
-        <div class="flex items-center justify-between cursor-pointer">
-          <div class="flex items-center gap-2">
-            <span class="${statusClass}">${statusText}</span>
-            <div>
-              <p class="font-semibold text-gray-800 text-base">${item.age}</p>
-              <p class="text-xs text-gray-600 due-date ${isCompleted ? 'hidden' : ''}">Due: ${dueDate.toLocaleDateString('en-IN')}</p>
-              <p class="text-xs text-gray-600 completed-date ${isCompleted ? '' : 'hidden'}">${isCompleted ? `Completed: ${this.getFirstCompletionDate(completedForAge).toLocaleDateString('en-IN')}` : ''}</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-2">
-            <p class="text-xs text-gray-700 whitespace-nowrap hidden sm:block">${item.vaccines.join(', ')}</p>
-            <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-            </svg>
-          </div>
-        </div>
-        <div class="card-details">
-          <p class="text-xs text-gray-600 mb-1 detail-due hidden"></p>
-          <p class="font-semibold mb-1 text-gray-800">Vaccines to be administered:</p>
-          <ul class="list-disc pl-5 mb-2 text-sm text-gray-700">
-            ${item.vaccines.map(v => `<li>${v}</li>`).join('')}
-          </ul>
-          <button class="mark-btn bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs hover:bg-blue-200 transition duration-200 ease-in-out ${isCompleted ? 'hidden' : ''}">
-            Mark as Complete
-          </button>
-          <div class="complete-form mt-2 hidden">
-            <input type="date" class="comp-date border text-xs p-1 rounded-md mr-1 outline-none" />
-            <button class="save-btn bg-green-600 text-white px-2 py-1 rounded-md text-xs hover:bg-green-700 transition duration-200 ease-in-out shadow-sm">
-              Save
-            </button>
-            <p class="error-text hidden text-xs mt-1">Select a date.</p>
-          </div>
-        </div>
-      `;
-
+      const card = this.createScheduleCard(item, dueDate, today, { isCompleted, completedForAge });
       this.scheduleOutput.appendChild(card);
-
-      // Add event listeners
-      card.querySelector('.cursor-pointer').addEventListener('click', () => {
-        card.classList.toggle('expanded');
-      });
-
+      this.attachScheduleCardHandlers(card);
       this.setupMarkComplete(card, dueDate, item);
+    });
+  }
+
+  /* eslint-disable-next-line max-lines-per-function */
+  createScheduleCard(item, dueDate, today, state) {
+    const { isCompleted, completedForAge } = state;
+    let statusClass = 'status-upcoming';
+    let statusText = 'Upcoming';
+    if (isCompleted) {
+      statusClass = 'status-completed';
+      statusText = 'Completed';
+    } else if (dueDate < today) {
+      statusClass = 'status-due';
+      statusText = 'Due / Overdue';
+    }
+
+    const card = document.createElement('div');
+    card.className = 'schedule-card fade-in';
+    card.innerHTML = `
+      <div class="flex items-center justify-between cursor-pointer">
+        <div class="flex items-center gap-2">
+          <span class="${statusClass}">${statusText}</span>
+          <div>
+            <p class="font-semibold text-gray-800 text-base">${item.age}</p>
+            <p class="text-xs text-gray-600 due-date ${isCompleted ? 'hidden' : ''}">Due: ${dueDate.toLocaleDateString('en-IN')}</p>
+            <p class="text-xs text-gray-600 completed-date ${isCompleted ? '' : 'hidden'}">${isCompleted ? `Completed: ${this.getFirstCompletionDate(completedForAge).toLocaleDateString('en-IN')}` : ''}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <p class="text-xs text-gray-700 whitespace-nowrap hidden sm:block">${item.vaccines.join(', ')}</p>
+          <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </div>
+      </div>
+      <div class="card-details">
+        <p class="text-xs text-gray-600 mb-1 detail-due hidden"></p>
+        <p class="font-semibold mb-1 text-gray-800">Vaccines to be administered:</p>
+        <ul class="list-disc pl-5 mb-2 text-sm text-gray-700">
+          ${item.vaccines.map(v => `<li>${v}</li>`).join('')}
+        </ul>
+        <button class="mark-btn bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs hover:bg-blue-200 transition duration-200 ease-in-out ${isCompleted ? 'hidden' : ''}">
+          Mark as Complete
+        </button>
+        <div class="complete-form mt-2 hidden">
+          <input type="date" class="comp-date border text-xs p-1 rounded-md mr-1 outline-none" />
+          <button class="save-btn bg-green-600 text-white px-2 py-1 rounded-md text-xs hover:bg-green-700 transition duration-200 ease-in-out shadow-sm">
+            Save
+          </button>
+          <p class="error-text hidden text-xs mt-1">Select a date.</p>
+        </div>
+      </div>
+    `;
+    return card;
+  }
+
+  attachScheduleCardHandlers(card) {
+    card.querySelector('.cursor-pointer').addEventListener('click', () => {
+      card.classList.toggle('expanded');
     });
   }
 
@@ -470,64 +491,62 @@ class VaccinationTracker {
   }
 
   // Setup mark complete functionality
-  /* eslint-disable-next-line max-lines-per-function */
   setupMarkComplete(card, dueDate, scheduleItem) {
     const markBtn = card.querySelector('.mark-btn');
     const form = card.querySelector('.complete-form');
+    markBtn.addEventListener('click', () => {
+      markBtn.classList.add('hidden');
+      form.classList.remove('hidden');
+    });
+    form.querySelector('.save-btn').addEventListener('click', () => this.handleSaveCompletion(card, form, dueDate, scheduleItem));
+  }
+
+  handleSaveCompletion(card, form, dueDate, scheduleItem) {
+    const dateInput = form.querySelector('.comp-date');
+    const { value: completionDate } = dateInput;
+
+    window.vaccinationValidator.clearErrors();
+    if (!window.vaccinationValidator.validateCompletionDate(completionDate, this.currentChild.dob)) {
+      const [firstError] = window.vaccinationValidator.getErrors();
+      form.querySelector('.error-text').textContent = firstError;
+      form.querySelector('.error-text').classList.remove('hidden');
+      return;
+    }
+
+    form.querySelector('.error-text').classList.add('hidden');
+    scheduleItem.vaccines.forEach(vaccine => {
+      window.vaccinationStorage.saveVaccinationCompletion(
+        this.currentChild.id,
+        scheduleItem.age,
+        vaccine,
+        completionDate
+      );
+    });
+
+    this.updateCompletionUI(card, form, completionDate, dueDate);
+
+    // Re-render schedule to reflect persistent completion state and sync dashboard
+    const currentDob = new Date(this.currentChild.dob);
+    this.renderSchedule(currentDob);
+    this.renderProfilesDashboard();
+  }
+
+  updateCompletionUI(card, form, completionDate, dueDate) {
     const dueEl = card.querySelector('.due-date');
     const compEl = card.querySelector('.completed-date');
     const badge = card.querySelector('span.status-due, span.status-upcoming, span.status-completed');
     const detailDue = card.querySelector('.detail-due');
 
-    markBtn.addEventListener('click', () => {
-      markBtn.classList.add('hidden');
-      form.classList.remove('hidden');
-    });
-
-    form.querySelector('.save-btn').addEventListener('click', () => {
-      const dateInput = form.querySelector('.comp-date');
-      const { value: completionDate } = dateInput;
-
-      window.vaccinationValidator.clearErrors();
-      if (!window.vaccinationValidator.validateCompletionDate(completionDate, this.currentChild.dob)) {
-        const [firstError] = window.vaccinationValidator.getErrors();
-        form.querySelector('.error-text').textContent = firstError;
-        form.querySelector('.error-text').classList.remove('hidden');
-        return;
-      }
-
-      form.querySelector('.error-text').classList.add('hidden');
-
-      // Save completion data
-      scheduleItem.vaccines.forEach(vaccine => {
-        window.vaccinationStorage.saveVaccinationCompletion(
-          this.currentChild.id,
-          scheduleItem.age,
-          vaccine,
-          completionDate
-        );
-      });
-
-      const fmt = new Date(completionDate).toLocaleDateString('en-IN');
-
-      // Update display
-      dueEl.classList.add('hidden');
-      compEl.textContent = `Completed: ${fmt}`;
-      compEl.classList.remove('hidden');
-      badge.textContent = 'Completed';
-      badge.classList.remove('status-due', 'status-upcoming');
-      badge.classList.add('status-completed');
-      form.classList.add('hidden');
-
-      detailDue.textContent = `Due: ${dueDate.toLocaleDateString('en-IN')}`;
-      detailDue.classList.remove('hidden');
-
-      // Re-render schedule to reflect persistent completion state and sync dashboard
-      // (e.g., next card statuses may change, and dashboard counts must update)
-      const currentDob = new Date(this.currentChild.dob);
-      this.renderSchedule(currentDob);
-      this.renderProfilesDashboard();
-    });
+    const fmt = new Date(completionDate).toLocaleDateString('en-IN');
+    dueEl.classList.add('hidden');
+    compEl.textContent = `Completed: ${fmt}`;
+    compEl.classList.remove('hidden');
+    badge.textContent = 'Completed';
+    badge.classList.remove('status-due', 'status-upcoming');
+    badge.classList.add('status-completed');
+    form.classList.add('hidden');
+    detailDue.textContent = `Due: ${dueDate.toLocaleDateString('en-IN')}`;
+    detailDue.classList.remove('hidden');
   }
 
   // Cancel edit mode
