@@ -40,6 +40,7 @@ class VaccinationStorage {
     try {
       return JSON.parse(raw);
     } catch (e) {
+      /* eslint-disable-next-line no-console */
       console.error('Invalid children JSON in storage:', e);
       return [];
     }
@@ -92,6 +93,7 @@ class VaccinationStorage {
       const parsed = JSON.parse(raw);
       return parsed && typeof parsed === 'object' ? parsed : { completions: {} };
     } catch (e) {
+      /* eslint-disable-next-line no-console */
       console.error('Invalid vaccination JSON in storage:', e);
       return { completions: {} };
     }
@@ -143,6 +145,7 @@ class VaccinationStorage {
 
       return true;
     } catch (error) {
+      /* eslint-disable-next-line no-console */
       console.error('Error importing data:', error);
       return false;
     }

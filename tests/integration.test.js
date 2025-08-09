@@ -29,6 +29,7 @@ describe('VaccinationTracker Integration Tests', () => {
     // Initialize modules
     storage = new VaccinationStorage();
     validator = new VaccinationValidator();
+    // Ensure app code won't fail when certain optional elements are absent
     tracker = new VaccinationTracker();
   });
 
@@ -284,12 +285,14 @@ describe('VaccinationTracker Integration Tests', () => {
 
     test('should show error when no schedule exists', () => {
       const downloadBtn = document.getElementById('downloadCalendarBtn');
+      const errorMsg = document.getElementById('errorMsg');
 
       // Try to download without generating schedule
       downloadBtn.click();
 
-      // Verify alert is shown
-      expect(alert).toHaveBeenCalledWith('Please generate a schedule first.');
+      // Verify UI error is shown instead of alert
+      expect(errorMsg.classList.contains('hidden')).toBe(false);
+      expect(errorMsg.textContent).toBe('Please generate a schedule first.');
     });
   });
 

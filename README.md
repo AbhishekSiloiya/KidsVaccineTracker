@@ -36,6 +36,46 @@ A responsive web application for tracking children's vaccination schedules based
 - **Validation**: Custom validation library
 - **Export**: ICS format for calendar integration
 
+## Development
+
+- Node.js 18+ recommended.
+- Install dependencies:
+
+```bash
+npm install
+```
+
+### Linting
+
+```bash
+npm run lint       # check
+npm run lint:fix   # auto-fix
+```
+
+Notes:
+- The codebase avoids blocking browser APIs in production logic. We replaced direct `alert`/`confirm` with UI flows or error display. Any remaining usages are wrapped and explicitly allowed with inline eslint disables as needed.
+- `console` usage is minimized. Where necessary, logs are routed via controlled calls and annotated to satisfy lint rules.
+
+### Testing
+
+Jest with jsdom is configured. Useful commands:
+
+```bash
+npm test           # run all tests
+npm run test:watch # watch mode
+npm run test:ci    # CI-friendly run with coverage
+```
+
+The test environment (`tests/setup.js`) provides:
+- Mocks for `localStorage`, `sessionStorage`, `alert`, `URL.createObjectURL`, and service worker registration
+- DOM helpers and global utilities
+
+### Validate Before Commit
+
+```bash
+npm run validate   # runs lint then tests
+```
+
 ## Browser Support
 
 - Chrome 60+
@@ -49,8 +89,10 @@ All data is stored locally in your browser. No information is sent to external s
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
+- Create a feature branch
+- Ensure `npm run validate` passes
+- Open a PR describing changes
 
 ## License
 
-This project is open source and available under the MIT License. 
+This project is open source and available under the MIT License.

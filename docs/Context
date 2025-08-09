@@ -1,0 +1,227 @@
+I'm going to scan the key source files and tests to understand the app’s features, flows, and storage model so I can produce accurate context documentation.
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/validation.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/index.html
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/sw.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/manifest.json
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/README.md
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/integration.test.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/storage.test.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/validation.test.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/simple.test.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/working.test.js
+Read file: /Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/tests/setup.js
+
+I scanned the core JS, HTML, and tests to map the features, workflows, and storage schema. Below is the requested context documentation.
+
+### Project overview
+- A client-side PWA to generate and track children’s vaccination schedules based on the IAP 2024 schedule.
+- Core stack: Vanilla JS + TailwindCSS + LocalStorage + Service Worker (offline support).
+- Entry point/UI: `index.html` with controllers in `js/app.js`, storage in `js/storage.js`, validation in `js/validation.js`.
+
+### Architecture and key files
+- `index.html`: UI markup for input, schedule view, and profiles dashboard.
+- `js/app.js`: `VaccinationTracker` class handles UI events, schedule generation, profile dashboard, marking completions, and ICS export.
+- `js/storage.js`: `VaccinationStorage` manages persistence in `localStorage` (children and vaccination completion data).
+- `js/validation.js`: `VaccinationValidator` enforces name/DOB/completion date constraints.
+- `sw.js` + `manifest.json`: PWA installability and caching.
+
+### Key features
+- Profile management:
+  - Create, load latest, view, edit, and delete child profiles.
+  - Multi-profile dashboard with per-child stats and quick actions (View/Delete).
+- Vaccination schedule generation:
+  - Based on DOB and a predefined IAP schedule; each milestone shows status (Upcoming, Due/Overdue, Completed), due date and vaccine list.
+- Completion tracking:
+  - Mark an entire milestone’s vaccines as completed with a date; updates persisted and UI re-rendered (including dashboard stats).
+- Calendar export (ICS):
+  - Exports all vaccination items as all-day events to import into calendar apps.
+- PWA/offline:
+  - Network-first for HTML/CSS/JS, cache-first for other assets; installable with app icons.
+
+### Primary user journeys
+- First-time setup:
+  - Enter child’s name and DOB → Generate schedule → See read-only view for that child.
+- Manage schedule:
+  - Expand milestone cards → Review due date and vaccines → Mark as Complete → Provide completion date → Status changes to Completed.
+- Export calendar:
+  - Click “Download Calendar” to get `.ics` with events for all vaccines.
+- Manage profiles:
+  - Open dashboard → View profile cards (age, due soon, overdue, completed counts) → View to switch, Delete to remove (includes vaccination data) → Add Child to create a new profile.
+- Edit profile:
+  - Click edit → Switch to editable form → Update fields → Re-generate and save.
+
+### Vaccination list (IAP schedule modeled)
+- Ages with vaccines:
+  - Birth: BCG, OPV 0, Hep B-1
+  - 6 Weeks: DTWP/DTaP-1, IPV-1, Hib-1, Rotavirus-1, PCV-1
+  - 10 Weeks: DTWP/DTaP-2, IPV-2, Hib-2, Rotavirus-2, PCV-2
+  - 14 Weeks: DTWP/DTaP-3, IPV-3, Hib-3, Rotavirus-3, PCV-3
+  - 6 Months: Influenza (IIV)-1
+  - 7 Months: Influenza (IIV)-2
+  - 6-9 Months: Typhoid Conjugate Vaccine
+  - 9 Months: MMR-1, Meningococcal-1
+  - 12 Months: Hepatitis A, Meningococcal-2, Japanese Encephalitis-1, Cholera-1
+  - 13 Months: Japanese Encephalitis-2, Cholera-2
+  - 15 Months: MMR-2, Varicella-1, PCV Booster
+  - 16-18 Months: DTWP/DTaP-B1, Hib-B1, IPV-B1
+  - 18-19 Months: Hep A-2, Varicella-2
+  - 4-6 Years: DTWP/DTaP-B2, IPV-B2, MMR-3
+  - 10-12 Years: Tdap, HPV
+
+You can view the exact source for the schedule in:
+```4:20:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+const vaccinationSchedule = [
+  { age: 'Birth', vaccines: ['BCG', 'OPV 0', 'Hep B-1'] },
+  { age: '6 Weeks', vaccines: ['DTWP/DTaP-1', 'IPV-1', 'Hib-1', 'Rotavirus-1', 'PCV-1'] },
+  ...
+  { age: '10-12 Years', vaccines: ['Tdap', 'HPV'] }
+];
+```
+
+### Functional behavior
+- Schedule rendering and status:
+  - For each milestone, compute due date from DOB and age label; statuses: Completed if all vaccines at that age are saved; Due/Overdue if past today; else Upcoming.
+  - “Due soon” threshold: 30 days.
+  - Next due label is computed from the earliest upcoming milestone.
+```229:284:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+computeMilestoneStatsForChild(child) {
+  const dueSoonDays = 30;
+  ...
+  if (isMilestoneCompleted(item.age, item.vaccines)) { ... }
+  if (due < today) { overdueCount += 1; } else { ... if (daysUntil <= dueSoonDays) { dueSoonCount += 1; } ... }
+  return { ageString, milestonesCompleted, totalMilestones, overdueCount, dueSoonCount, upcomingCount, nextDueDate, nextDueLabel };
+}
+```
+- Date calculation:
+  - Supports weeks, months, years; for ranges like “6-9 Months”, uses the lower bound.
+```415:440:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+calcDate(base, ageStr) {
+  ...
+  if (numStr.includes('-')) { numStr = numStr.split('-')[0]; }
+  if (unit.startsWith('week')) d.setDate(d.getDate() + n * 7);
+  else if (unit.startsWith('month')) d.setMonth(d.getMonth() + n);
+  else if (unit.includes('year')) d.setFullYear(d.getFullYear() + n);
+  return d;
+}
+```
+- Marking completion:
+  - Validates date; saves completion for all vaccines in that milestone; re-renders schedule and dashboard.
+```442:499:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+scheduleItem.vaccines.forEach(vaccine => {
+  window.vaccinationStorage.saveVaccinationCompletion(this.currentChild.id, scheduleItem.age, vaccine, completionDate);
+});
+this.renderSchedule(currentDob);
+this.renderProfilesDashboard();
+```
+- ICS export:
+  - Generates VEVENT per vaccine, all-day, date-only DTSTART/DTEND.
+```544:571:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/app.js
+icsString += `DTSTART;VALUE=DATE:${formattedDate}\n`;
+icsString += `DTEND;VALUE=DATE:${formattedEndDate}\n`;
+icsString += `SUMMARY:${summary}\n`;
+```
+
+### Storage management
+- Storage keys:
+  - Children list: `vaccinationChildren`
+  - Per-child vaccination data: `vaccinationTrackerData_<childId>`
+```5:7:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+constructor() {
+  this.storageKey = 'vaccinationTrackerData';
+  this.childrenKey = 'vaccinationChildren';
+}
+```
+- Data model
+  - Child:
+    - id: string
+    - name: string
+    - dob: ISO date string
+    - createdAt: ISO timestamp
+  - Vaccination data (per child):
+    - completions: { [ageLabel]: { [vaccineName]: ISO date string } }
+- Example JSON
+```json
+{
+  "children": [
+    { "id": "abcd123", "name": "Aanya", "dob": "2023-01-01", "createdAt": "2024-02-01T10:00:00.000Z" }
+  ],
+  "vaccinationData": {
+    "abcd123": {
+      "completions": {
+        "Birth": { "BCG": "2023-01-01", "OPV 0": "2023-01-01", "Hep B-1": "2023-01-02" }
+      }
+    }
+  }
+}
+```
+- Operations
+  - Save/update child, list/get child, delete child (optional cascade completion data), save completion, export/import, clear all.
+```20:33:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+saveChild(childData) { ... ls.setItem(this.childrenKey, JSON.stringify(children)); }
+```
+```67:83:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+saveVaccinationCompletion(childId, age, vaccine, completionDate) { ... ls.setItem(key, JSON.stringify(data)); }
+```
+```85:98:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+getVaccinationData(childId) { ... return parsed && typeof parsed === 'object' ? parsed : { completions: {} }; }
+```
+```54:65:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+deleteChild(childId, { includeVaccinationData }) { ... if (includeVaccinationData) ls.removeItem(`${this.storageKey}_${childId}`); }
+```
+```111:149:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/storage.js
+exportData() { ... } 
+importData(jsonData) { ... }
+```
+
+### Validation rules
+- Name:
+  - Required; 2–50 chars; letters, spaces, hyphens, apostrophes, dots; Unicode letters allowed.
+```25:33:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/validation.js
+const nameRegex = /^[\p{L}\s\-'.]+$/u;
+```
+- Date of birth:
+  - Required; valid date; not in the future; child under 18 years.
+```36:64:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/validation.js
+if (ageInYears > 18) { this.errors.push('This tracker is designed for children under 18 years'); }
+```
+- Completion date:
+  - Required; valid date; not before DOB; not in the future.
+```66:93:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/js/validation.js
+if (completionDateObj < dobDate) {...}; if (completionDateObj > today) {...}
+```
+
+### UI structure and interactions
+- Input view:
+  - Fields: `#nameInput`, `#dobInput` → Generate → validates and saves child, renders schedule.
+- Read-only view:
+  - Displays child name, DOB, actions: Download Calendar, Edit.
+- Schedule:
+  - Cards per milestone: expand for details and completion form; show due or completed date.
+- Dashboard:
+  - `#profilesDashboard` with stats (`#statTotal`, `#statCompleted`, `#statOverdue`, `#statUpcoming`) and profile list with View/Delete and “Add Child”.
+- Keyboard support: Enter triggers generate from name/DOB inputs.
+
+### PWA/offline
+- Service Worker:
+  - Network-first for HTML/CSS/JS; cache-first for other same-origin requests.
+```39:81:/Users/abhisheksiloiya/Documents/Windsurf Projects/Vaccination Calendar/sw.js
+if (isDocument || isStyle || isScript) { event.respondWith(fetch(...).catch(() => caches.match(req))) } else { cache-first }
+```
+- Manifest: name, short_name, theme, icons (192/512).
+- SW registration skipped on localhost; uses relative `./sw.js` to support subpaths.
+
+### Testing
+- Jest + jsdom with unit and integration tests; threshold 80% coverage (see `tests/README.md` and `package.json`).
+- Integration covers: profile creation/loading, schedule generation, completion tracking, ICS generation, persistence, and error handling.
+
+### Limitations/assumptions
+- Schedule basis hardcoded for IAP 2024 (India).
+- For age ranges, due date uses the lower bound.
+- Completion marking applies to all vaccines within a milestone at once (per the current UI flow).
+
+- - -
+
+- Implemented a concise, structured context document covering features, flows, validation rules, schedule, storage schemas/keys, ICS export, PWA behavior, and tests.
+- Highlighted critical code references from `js/app.js`, `js/storage.js`, `js/validation.js`, `sw.js` for quick verification.

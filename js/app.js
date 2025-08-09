@@ -1,3 +1,5 @@
+
+/* eslint max-len: ["warn", { "code": 120, "ignoreStrings": true, "ignoreTemplateLiterals": true }] */
 // Main application logic for VaccinationTracker
 
 // Constants for the vaccination schedule
@@ -52,20 +54,32 @@ class VaccinationTracker {
     this.addChildBtn = document.getElementById('addChildBtn');
   }
 
-  // Bind event listeners
+  // Bind event listeners (guard against missing elements in test/dom setups)
   bindEvents() {
-    this.generateBtn.addEventListener('click', () => this.generateSchedule());
-    this.cancelEditBtn.addEventListener('click', () => this.cancelEdit());
-    this.editBtn.addEventListener('click', () => this.editChild());
-    this.downloadCalendarBtn.addEventListener('click', () => this.downloadCalendar());
+    if (this.generateBtn) {
+      this.generateBtn.addEventListener('click', () => this.generateSchedule());
+    }
+    if (this.cancelEditBtn) {
+      this.cancelEditBtn.addEventListener('click', () => this.cancelEdit());
+    }
+    if (this.editBtn) {
+      this.editBtn.addEventListener('click', () => this.editChild());
+    }
+    if (this.downloadCalendarBtn) {
+      this.downloadCalendarBtn.addEventListener('click', () => this.downloadCalendar());
+    }
 
     // Add keyboard support
-    this.nameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {this.generateSchedule();}
-    });
-    this.dobInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {this.generateSchedule();}
-    });
+    if (this.nameInput) {
+      this.nameInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {this.generateSchedule();}
+      });
+    }
+    if (this.dobInput) {
+      this.dobInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {this.generateSchedule();}
+      });
+    }
 
     // Dashboard events
     if (this.manageProfilesBtn) {
@@ -87,7 +101,7 @@ class VaccinationTracker {
     const children = window.vaccinationStorage.getAllChildren();
     if (children.length > 0) {
       // Load the most recent child
-      const lastChild = children[children.length - 1];
+      const [lastChild] = children.slice(-1);
       this.loadChildData(lastChild);
     }
   }
@@ -130,6 +144,7 @@ class VaccinationTracker {
   }
 
   // Render profiles list
+  /* eslint-disable-next-line max-lines-per-function */
   renderProfilesDashboard() {
     if (!this.profilesList) {return;}
     const children = window.vaccinationStorage.getAllChildren();
@@ -159,9 +174,18 @@ class VaccinationTracker {
       this.profilesList.appendChild(empty);
       return;
     }
+    /* eslint-disable-next-line max-lines-per-function */
     children.forEach((child) => {
       const stats = this.computeMilestoneStatsForChild(child);
-      const { ageString, overdueCount, dueSoonCount, milestonesCompleted, totalMilestones, nextDueDate, nextDueLabel } = stats;
+      const {
+        ageString,
+        overdueCount,
+        dueSoonCount,
+        milestonesCompleted,
+        totalMilestones,
+        nextDueDate,
+        nextDueLabel
+      } = stats;
 
       const row = document.createElement('div');
       row.className = 'profile-card';
@@ -197,7 +221,8 @@ class VaccinationTracker {
       });
 
       row.querySelector('.delete-btn').addEventListener('click', () => {
-        const ok = confirm(`Delete profile for ${child.name}? This cannot be undone.`);
+        // eslint-disable-next-line no-alert
+        const ok = window.confirm(`Delete profile for ${child.name}? This cannot be undone.`);
         if (!ok) {return;}
         window.vaccinationStorage.deleteChild(child.id, { includeVaccinationData: true });
         // If deleting the current child, reset the UI
@@ -227,6 +252,7 @@ class VaccinationTracker {
   }
 
   // Compute milestone stats for a child used by both pages to stay in sync
+  /* eslint-disable-next-line max-lines-per-function */
   computeMilestoneStatsForChild(child) {
     const dueSoonDays = 30;
     const dob = new Date(child.dob);
@@ -279,7 +305,7 @@ class VaccinationTracker {
       dueSoonCount,
       upcomingCount,
       nextDueDate,
-      nextDueLabel,
+      nextDueLabel
     };
   }
 
@@ -311,6 +337,7 @@ class VaccinationTracker {
       window.vaccinationStorage.saveChild(child);
       this.currentChild = child;
     } catch (e) {
+      /* eslint-disable-next-line no-console */
       console.error('Error saving child:', e);
       this.hideLoading();
       this.showError('We could not save data. Please check storage availability and try again.');
@@ -329,11 +356,13 @@ class VaccinationTracker {
   }
 
   // Render the vaccination schedule
+  /* eslint-disable-next-line max-lines-per-function */
   renderSchedule(dobDate) {
     this.scheduleOutput.innerHTML = '';
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    /* eslint-disable-next-line max-lines-per-function */
     vaccinationSchedule.forEach(item => {
       const dueDate = this.calcDate(dobDate, item.age);
       dueDate.setHours(0, 0, 0, 0);
@@ -409,7 +438,8 @@ class VaccinationTracker {
       .map((d) => new Date(d))
       .filter((d) => !isNaN(d.getTime()))
       .sort((a, b) => a - b);
-    return dates[0] || new Date();
+    const [first = new Date()] = dates;
+    return first;
   }
 
   // Calculate due date based on age string
@@ -417,12 +447,12 @@ class VaccinationTracker {
     if (!ageStr || typeof ageStr !== 'string') {return new Date(base);}
 
     const parts = ageStr.split(' ');
-    let numStr = parts[0];
-    const unit = parts.length > 1 ? parts[1].toLowerCase() : '';
+    let numStr = parts[0] ?? '';
+    const unit = (parts[1] ?? '').toLowerCase();
 
     // Handle ranges like "6-9 Months"
     if (numStr.includes('-')) {
-      numStr = numStr.split('-')[0];
+      [numStr] = numStr.split('-');
     }
 
     const n = parseInt(numStr, 10) || 0;
@@ -440,6 +470,7 @@ class VaccinationTracker {
   }
 
   // Setup mark complete functionality
+  /* eslint-disable-next-line max-lines-per-function */
   setupMarkComplete(card, dueDate, scheduleItem) {
     const markBtn = card.querySelector('.mark-btn');
     const form = card.querySelector('.complete-form');
@@ -455,11 +486,12 @@ class VaccinationTracker {
 
     form.querySelector('.save-btn').addEventListener('click', () => {
       const dateInput = form.querySelector('.comp-date');
-      const completionDate = dateInput.value;
+      const { value: completionDate } = dateInput;
 
       window.vaccinationValidator.clearErrors();
       if (!window.vaccinationValidator.validateCompletionDate(completionDate, this.currentChild.dob)) {
-        form.querySelector('.error-text').textContent = window.vaccinationValidator.getErrors()[0];
+        const [firstError] = window.vaccinationValidator.getErrors();
+        form.querySelector('.error-text').textContent = firstError;
         form.querySelector('.error-text').classList.remove('hidden');
         return;
       }
@@ -521,7 +553,7 @@ class VaccinationTracker {
   // Download calendar file
   downloadCalendar() {
     if (!this.currentChild) {
-      alert('Please generate a schedule first.');
+      this.showError('Please generate a schedule first.');
       return;
     }
 
@@ -550,7 +582,7 @@ class VaccinationTracker {
       const endDate = new Date(dueDate);
       endDate.setDate(endDate.getDate() + 1);
       const formattedEndDate = endDate.toISOString().slice(0, 10).replace(/-/g, '');
-      const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
+      const [now] = new Date().toISOString().replace(/[-:]/g, '').split('.');
 
       item.vaccines.forEach(vaccine => {
         const summary = `${childName} - ${vaccine}`;
@@ -618,10 +650,12 @@ if ('serviceWorker' in navigator) {
       // Use relative path to work under subpaths too
       navigator.serviceWorker.register('./sw.js')
         .then(registration => {
-          console.log('SW registered: ', registration);
+          /* eslint-disable-next-line no-console */
+          console.info('SW registered: ', registration);
         })
         .catch(registrationError => {
-          console.log('SW registration failed: ', registrationError);
+          /* eslint-disable-next-line no-console */
+          console.warn('SW registration failed: ', registrationError);
         });
     });
   }

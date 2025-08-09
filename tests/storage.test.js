@@ -81,6 +81,7 @@ describe('VaccinationStorage', () => {
         { id: 'child-2', name: 'Jane', dob: '2023-06-01' }
       ];
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockChildren));
 
       const children = storage.getAllChildren();
@@ -88,6 +89,7 @@ describe('VaccinationStorage', () => {
     });
 
     test('should handle invalid JSON in localStorage', () => {
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue('invalid-json');
 
       const children = storage.getAllChildren();
@@ -102,6 +104,7 @@ describe('VaccinationStorage', () => {
         { id: 'child-2', name: 'Jane', dob: '2023-06-01' }
       ];
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockChildren));
 
       const child = storage.getChild('child-1');
@@ -113,6 +116,7 @@ describe('VaccinationStorage', () => {
         { id: 'child-1', name: 'John', dob: '2023-01-01' }
       ];
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockChildren));
 
       const child = storage.getChild('non-existent');
@@ -127,6 +131,7 @@ describe('VaccinationStorage', () => {
         { id: 'child-2', name: 'Jane', dob: '2023-06-01' }
       ];
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockChildren));
 
       storage.deleteChild('child-1');
@@ -142,6 +147,7 @@ describe('VaccinationStorage', () => {
         { id: 'child-1', name: 'John', dob: '2023-01-01' }
       ];
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockChildren));
 
       storage.deleteChild('non-existent');
@@ -184,6 +190,7 @@ describe('VaccinationStorage', () => {
         }
       };
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(existingData));
 
       storage.saveVaccinationCompletion(childId, 'Birth', 'OPV 0', '2023-01-02');
@@ -215,6 +222,7 @@ describe('VaccinationStorage', () => {
         }
       };
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(JSON.stringify(mockData));
 
       const data = storage.getVaccinationData(childId);
@@ -223,6 +231,7 @@ describe('VaccinationStorage', () => {
 
     test('should return empty completions object when no data exists', () => {
       const childId = 'child-1';
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(null);
 
       const data = storage.getVaccinationData(childId);
@@ -231,6 +240,7 @@ describe('VaccinationStorage', () => {
 
     test('should handle invalid JSON in vaccination data', () => {
       const childId = 'child-1';
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue('invalid-json');
 
       const data = storage.getVaccinationData(childId);
@@ -242,6 +252,7 @@ describe('VaccinationStorage', () => {
     test('should clear all vaccination tracker data', () => {
       // Mock localStorage keys
       Object.defineProperty(localStorage, 'length', { value: 3 });
+      expect(jest.isMockFunction(localStorage.key)).toBe(true);
       localStorage.key.mockImplementation((index) => {
         const keys = ['vaccinationTrackerData_child-1', 'vaccinationChildren', 'other-data'];
         return keys[index];
@@ -269,6 +280,7 @@ describe('VaccinationStorage', () => {
         }
       };
 
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem
         .mockReturnValueOnce(JSON.stringify(mockChildren))
         .mockReturnValueOnce(JSON.stringify(mockVaccinationData));
@@ -286,6 +298,7 @@ describe('VaccinationStorage', () => {
     });
 
     test('should handle empty data export', () => {
+      expect(jest.isMockFunction(localStorage.getItem)).toBe(true);
       localStorage.getItem.mockReturnValue(null);
 
       const exportedData = storage.exportData();

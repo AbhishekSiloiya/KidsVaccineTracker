@@ -54,6 +54,12 @@ if (typeof global !== 'undefined') {
   global.sessionStorage = sessionStorageMock;
 }
 
+// Ensure window-scoped storage also uses our mocks
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: true });
+  Object.defineProperty(window, 'sessionStorage', { value: sessionStorageMock, writable: true });
+}
+
 // Mock console methods to reduce noise in tests
 global.console = {
   ...console,

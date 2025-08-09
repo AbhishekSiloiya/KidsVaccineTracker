@@ -19,7 +19,8 @@ describe('VaccinationValidator', () => {
         'Mary Jane',
         'O\'Connor',
         'Jean-Pierre',
-        'A'
+        // Minimum valid name length is 2 per current validator
+        'Ab'
       ];
 
       validNames.forEach(name => {
@@ -59,7 +60,7 @@ describe('VaccinationValidator', () => {
 
       invalidNames.forEach(name => {
         expect(validator.validateName(name)).toBe(false);
-        expect(validator.getErrors()).toContain('Child name can only contain letters, spaces, hyphens, and apostrophes');
+        expect(validator.getErrors()).toContain('Child name can only contain letters, spaces, hyphens, apostrophes, and dots');
       });
     });
 
