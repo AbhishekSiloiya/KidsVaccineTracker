@@ -4,10 +4,10 @@
 
 // Constants for the vaccination schedule
 const vaccinationSchedule = [
-  { age: 'Birth', vaccines: ['BCG', 'OPV 0', 'Hep B-1'] },
-  { age: '6 Weeks', vaccines: ['DTWP/DTaP-1', 'IPV-1', 'Hib-1', 'Rotavirus-1', 'PCV-1'] },
-  { age: '10 Weeks', vaccines: ['DTWP/DTaP-2', 'IPV-2', 'Hib-2', 'Rotavirus-2', 'PCV-2'] },
-  { age: '14 Weeks', vaccines: ['DTWP/DTaP-3', 'IPV-3', 'Hib-3', 'Rotavirus-3', 'PCV-3'] },
+  { age: 'Birth', vaccines: ['BCG', 'OPV 0', 'Hepatitis B-1'] },
+  { age: '6 Weeks', vaccines: ['DTwP/DTaP-1', 'IPV-1', 'Hib-1', 'Rotavirus-1', 'PCV-1', 'Hepatitis B-2'] },
+  { age: '10 Weeks', vaccines: ['DTwP/DTaP-2', 'IPV-2', 'Hib-2', 'Rotavirus-2', 'PCV-2', 'Hepatitis B-3'] },
+  { age: '14 Weeks', vaccines: ['DTwP/DTaP-3', 'IPV-3', 'Hib-3', 'Rotavirus-3', 'PCV-3', 'Hepatitis B-4'] },
   { age: '6 Months', vaccines: ['Influenza (IIV)-1'] },
   { age: '7 Months', vaccines: ['Influenza (IIV)-2'] },
   { age: '6-9 Months', vaccines: ['Typhoid Conjugate Vaccine'] },
@@ -15,10 +15,12 @@ const vaccinationSchedule = [
   { age: '12 Months', vaccines: ['Hepatitis A', 'Meningococcal-2', 'Japanese Encephalitis-1', 'Cholera-1'] },
   { age: '13 Months', vaccines: ['Japanese Encephalitis-2', 'Cholera-2'] },
   { age: '15 Months', vaccines: ['MMR-2', 'Varicella-1', 'PCV Booster'] },
-  { age: '16-18 Months', vaccines: ['DTWP/DTaP-B1', 'Hib-B1', 'IPV-B1'] },
-  { age: '18-19 Months', vaccines: ['Hep A-2', 'Varicella-2'] },
-  { age: '4-6 Years', vaccines: ['DTWP/DTaP-B2', 'IPV-B2', 'MMR-3'] },
-  { age: '10-12 Years', vaccines: ['Tdap', 'HPV'] }
+  { age: '16-18 Months', vaccines: ['DTwP/DTaP-B1', 'Hib-B1', 'IPV-B1'] },
+  { age: '18-19 Months', vaccines: ['Hepatitis A-2', 'Varicella-2'] },
+  { age: '4-6 Years', vaccines: ['DTwP/DTaP-B2', 'IPV-B2', 'MMR-3'] },
+  { age: '10 Years', vaccines: ['Tdap'] },
+  { age: '15-18 Years', vaccines: ['HPV'] },
+  { age: '16-18 Years', vaccines: ['Td'] }
 ];
 
 class VaccinationTracker {
@@ -110,7 +112,7 @@ class VaccinationTracker {
   loadChildData(child) {
     this.currentChild = child;
     this.childNameDisplay.textContent = child.name;
-    this.childDobDisplay.textContent = new Date(child.dob).toLocaleDateString('en-IN');
+    this.childDobDisplay.innerHTML = `<strong>DOB:</strong> ${new Date(child.dob).toLocaleDateString('en-IN')}`;
 
     this.editableView.classList.add('hidden');
     this.readOnlyView.classList.remove('hidden');
@@ -211,28 +213,33 @@ class VaccinationTracker {
     const row = document.createElement('div');
     row.className = 'profile-card';
     row.innerHTML = `
-      <div class="flex-1">
-        <div class="flex items-center justify-between gap-2 flex-wrap">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-800 text-base">${child.name}</span>
-            <span class="text-sm text-gray-600">Born ${new Date(child.dob).toLocaleDateString('en-IN')}</span>
-            <span class="text-sm text-gray-600">• ${ageString}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="pill pill-red">${overdueCount} Overdue</span>
-            <span class="pill pill-yellow">${dueSoonCount} Due Soon</span>
-            <span class="pill pill-green">${milestonesCompleted}/${totalMilestones} Complete</span>
-          </div>
+        <div class="flex !w-full flex-col">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex gap-4 items-baseline">
+                    <span class="!text-2xl font-semibold text-gray-800">${child.name}</span>
+                    <span class="!text-sm text-gray-600"><strong>Born:</strong> ${new Date(child.dob).toLocaleDateString('en-IN')} • ${ageString}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-full">${overdueCount} Overdue</span>
+                    <span class="px-3 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-full">${dueSoonCount} Due Soon</span>
+                    <span class="px-3 py-1 text-sm font-medium text-green-600 bg-green-50 border border-green-200 rounded-full">${milestonesCompleted}/${totalMilestones} Complete</span>
+                </div>
+                </div>
+                <div class="mt-3 bg-blue-50 text-blue-900 rounded-md p-3">
+                <div class="text-sm"><strong>Next Due:</strong> ${nextDueDate ? nextDueDate.toLocaleDateString('en-IN', {weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric'}) : 'N/A'}</div>
+                <div class="text-lg">${nextDueDate ? nextDueLabel : 'All done'}</div>
+            </div>
         </div>
-        <div class="mt-3 bg-blue-50 text-blue-900 rounded-md p-3">
-          <div class="text-sm font-semibold">Next Due:</div>
-          <div class="text-base">${nextDueDate ? nextDueLabel : 'All done'}</div>
+        <div class="flex flex-1 flex-col !w-full items-center gap-2 ml-3">
+            <button class="flex flex-row justify-center items-center gap-1 !w-full view-btn bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-sm hover:bg-gray-200">
+                <span class="material-symbols-outlined">read_more</span>
+                View
+            </button>
+            <button class="flex flex-row justify-center items-center gap-1 !w-full delete-btn bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700">
+                <span class="material-symbols-outlined">delete</span>
+                Delete
+            </button>
         </div>
-      </div>
-      <div class="flex items-center gap-2 ml-3">
-        <button class="view-btn bg-gray-100 text-gray-800 px-3 py-1 rounded-md text-xs hover:bg-gray-200">View</button>
-        <button class="delete-btn bg-red-600 text-white px-3 py-1 rounded-md text-xs hover:bg-red-700">Delete</button>
-      </div>
     `;
     return row;
   }
@@ -313,7 +320,7 @@ class VaccinationTracker {
       if (daysUntil <= dueSoonDays) { dueSoonCount += 1; }
       if (!nextDueDate || due < nextDueDate) {
         nextDueDate = due;
-        nextDueLabel = `${item.vaccines[0]} - ${due.toLocaleDateString('en-IN')}`;
+        nextDueLabel = `${item.vaccines[0]}`;
       }
     });
 
@@ -365,7 +372,7 @@ class VaccinationTracker {
 
     // Update display
     this.childNameDisplay.textContent = nameVal;
-    this.childDobDisplay.textContent = new Date(dobVal).toLocaleDateString('en-IN');
+    this.childDobDisplay.innerHTML = `<strong>DOB:</strong> ${new Date(dobVal).toLocaleDateString('en-IN')}`;
 
     this.editableView.classList.add('hidden');
     this.readOnlyView.classList.remove('hidden');
@@ -407,42 +414,51 @@ class VaccinationTracker {
       statusText = 'Due / Overdue';
     }
 
+    const options = {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    };
+
     const card = document.createElement('div');
     card.className = 'schedule-card fade-in';
     card.innerHTML = `
-      <div class="flex items-center justify-between cursor-pointer">
-        <div class="flex items-center gap-2">
-          <span class="${statusClass}">${statusText}</span>
-          <div>
-            <p class="font-semibold text-gray-800 text-base">${item.age}</p>
-            <p class="text-xs text-gray-600 due-date ${isCompleted ? 'hidden' : ''}">Due: ${dueDate.toLocaleDateString('en-IN')}</p>
-            <p class="text-xs text-gray-600 completed-date ${isCompleted ? '' : 'hidden'}">${isCompleted ? `Completed: ${this.getFirstCompletionDate(completedForAge).toLocaleDateString('en-IN')}` : ''}</p>
-          </div>
+        <div class="flex items-center justify-between cursor-pointer gap-10">
+            <div class="flex items-center gap-4 schedule-card-info">
+                <span class="${statusClass}">${statusText}</span>
+                <div>
+                    <p class="font-semibold text-gray-800 text-base">${item.age}</p>
+                    <p class="text-xs text-gray-600 whitespace-nowrap due-date ${isCompleted ? 'hidden' : ''}">Due: ${dueDate.toLocaleDateString('en-IN', options)}</p>
+                    <p class="text-xs text-gray-600 completed-date ${isCompleted ? '' : 'hidden'}">${isCompleted ? `Completed: ${this.getFirstCompletionDate(completedForAge).toLocaleDateString('en-IN')}` : ''}</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <p class="text-sm text-gray-700 whitespace-wrap">${item.vaccines.join(', ')}</p>
+                <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </div>
         </div>
-        <div class="flex items-center gap-2">
-          <p class="text-xs text-gray-700 whitespace-nowrap hidden sm:block">${item.vaccines.join(', ')}</p>
-          <svg class="expand-icon w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-          </svg>
+        <div class="card-details">
+            <p class="text-xs text-gray-600 mb-1 detail-due hidden"></p>
+            <p class="font-semibold mb-1 text-gray-800">Vaccines to be administered:</p>
+            <ul class="list-disc pl-5 mb-2 text-sm text-gray-700">
+                ${item.vaccines.map(v => `<li>${v}</li>`).join('')}
+            </ul>
+            <button class="flex gap-3 justify-center items-center mark-btn bg-blue-100 text-blue-800 px-2 py-1 mt-4 mb-2 rounded-md text-base hover:bg-blue-200 transition duration-200 ease-in-out ${isCompleted ? 'hidden' : ''}">
+                <span class="material-symbols-outlined"> calendar_check </span>
+                Mark as Complete
+            </button>
+            <div class="complete-form mt-3 hidden flex flex-row gap-2 justify-start items-center">
+                <input type="date" class="comp-date border text-base p-1 rounded-md mr-1 outline-none">
+                <button class="flex gap-2 justify-center items-center save-btn text-green-800 bg-green-200 border border-green-400 px-2 py-1 rounded-md text-base hover:bg-green-700 hover:text-white transition duration-200 ease-in-out shadow-sm">
+                    <span class="material-symbols-outlined"> free_cancellation </span>
+                    Save
+                </button>
+                <p class="error-text hidden text-sm mt-1">Select a date.</p>
+            </div>
         </div>
-      </div>
-      <div class="card-details">
-        <p class="text-xs text-gray-600 mb-1 detail-due hidden"></p>
-        <p class="font-semibold mb-1 text-gray-800">Vaccines to be administered:</p>
-        <ul class="list-disc pl-5 mb-2 text-sm text-gray-700">
-          ${item.vaccines.map(v => `<li>${v}</li>`).join('')}
-        </ul>
-        <button class="mark-btn bg-blue-100 text-blue-800 px-2 py-1 rounded-md text-xs hover:bg-blue-200 transition duration-200 ease-in-out ${isCompleted ? 'hidden' : ''}">
-          Mark as Complete
-        </button>
-        <div class="complete-form mt-2 hidden">
-          <input type="date" class="comp-date border text-xs p-1 rounded-md mr-1 outline-none" />
-          <button class="save-btn bg-green-600 text-white px-2 py-1 rounded-md text-xs hover:bg-green-700 transition duration-200 ease-in-out shadow-sm">
-            Save
-          </button>
-          <p class="error-text hidden text-xs mt-1">Select a date.</p>
-        </div>
-      </div>
     `;
     return card;
   }
