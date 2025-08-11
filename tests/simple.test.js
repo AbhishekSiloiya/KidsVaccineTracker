@@ -24,8 +24,26 @@ describe('Basic Test Setup', () => {
 
 // Test the actual classes by loading them
 describe('Class Loading Test', () => {
-  const { VaccinationValidator } = require('../js/validation.js');
-  const { VaccinationStorage } = require('../js/storage.js');
+  let VaccinationValidator;
+  let VaccinationStorage;
+
+  beforeAll(() => {
+    // Load the classes by evaluating the code
+    const fs = require('fs');
+    const path = require('path');
+
+    // Load validation.js
+    const validationCode = fs.readFileSync(path.join(__dirname, '../js/validation.js'), 'utf8');
+    eval(validationCode);
+
+    // Load storage.js
+    const storageCode = fs.readFileSync(path.join(__dirname, '../js/storage.js'), 'utf8');
+    eval(storageCode);
+
+    // Get the classes from global scope
+    VaccinationValidator = global.VaccinationValidator;
+    VaccinationStorage = global.VaccinationStorage;
+  });
 
   test('should load VaccinationValidator class', () => {
     expect(VaccinationValidator).toBeDefined();

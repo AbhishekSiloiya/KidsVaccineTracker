@@ -672,11 +672,6 @@ if (typeof window !== 'undefined') {
   window.VaccinationTracker = VaccinationTracker;
 }
 
-// CommonJS export for Jest/node environment
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { VaccinationTracker };
-}
-
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   new VaccinationTracker();

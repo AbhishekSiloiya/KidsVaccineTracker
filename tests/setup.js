@@ -215,12 +215,25 @@ global.testUtils = {
 const fs = require('fs');
 const path = require('path');
 
-// Load modules via require so Jest can instrument coverage
-const { VaccinationValidator } = require('../js/validation.js');
-const { VaccinationStorage } = require('../js/storage.js');
-const { VaccinationTracker } = require('../js/app.js');
+// Load validation.js
+const validationCode = fs.readFileSync(path.join(__dirname, '../js/validation.js'), 'utf8');
+eval(validationCode);
+
+// Load storage.js
+const storageCode = fs.readFileSync(path.join(__dirname, '../js/storage.js'), 'utf8');
+eval(storageCode);
+
+// Load app.js
+const appCode = fs.readFileSync(path.join(__dirname, '../js/app.js'), 'utf8');
+eval(appCode);
 
 // Make classes available globally for tests
-global.VaccinationValidator = VaccinationValidator;
-global.VaccinationStorage = VaccinationStorage;
-global.VaccinationTracker = VaccinationTracker;
+if (typeof VaccinationValidator !== 'undefined') {
+  global.VaccinationValidator = VaccinationValidator;
+}
+if (typeof VaccinationStorage !== 'undefined') {
+  global.VaccinationStorage = VaccinationStorage;
+}
+if (typeof VaccinationTracker !== 'undefined') {
+  global.VaccinationTracker = VaccinationTracker;
+} 

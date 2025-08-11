@@ -129,9 +129,3 @@ if (typeof window !== 'undefined') {
   window.VaccinationValidator = VaccinationValidator;
   window.vaccinationValidator = new VaccinationValidator();
 }
-
-// CommonJS export for Jest/node environment (enables proper coverage instrumentation instead of eval)
-// This is ignored in the browser.
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { VaccinationValidator };
-}
