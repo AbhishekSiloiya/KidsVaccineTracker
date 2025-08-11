@@ -157,3 +157,8 @@ if (typeof window !== 'undefined') {
   window.VaccinationStorage = VaccinationStorage;
   window.vaccinationStorage = new VaccinationStorage();
 }
+
+// CommonJS export for Jest/node environment
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { VaccinationStorage };
+}
