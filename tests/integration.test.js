@@ -108,7 +108,7 @@ describe('VaccinationTracker Integration Tests', () => {
       const childDobDisplay = document.getElementById('childDobDisplay');
 
       expect(childNameDisplay.textContent).toBe('Existing Child');
-      expect(childDobDisplay.textContent).toBe('1/1/2023');
+      expect(childDobDisplay.textContent).toBe('DOB: 1/1/2023');
     });
   });
 
@@ -164,7 +164,7 @@ describe('VaccinationTracker Integration Tests', () => {
       const scheduleText = scheduleOutput.textContent;
       
       // Birth vaccinations should be due on birth date
-      expect(scheduleText).toContain('Due: 1/1/2023');
+      expect(scheduleText).toContain('Due: Sunday, 1/1/2023');
       
       // 6 weeks should be approximately 6 weeks after birth
       expect(scheduleText).toContain('6 Weeks');
