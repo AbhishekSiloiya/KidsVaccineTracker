@@ -1,0 +1,66 @@
+{% extends 'base.html' %} {% block title %}Add Child - VaccinationTracker{% endblock %} {% block content %}
+<!-- Add Child Form Only -->
+<div id="inputCard" class="combined-card mb-6">
+    <form id="addChildForm" method="POST" action="{{ url_for('views.add_child') }}" novalidate>
+        <h2 class="text-2xl font-bold text-gray-800 mb-1">Add a Child</h2>
+        <p class="text-gray-600 my-4">Enter your child's details to generate a personalized vaccination schedule.</p>
+
+        {% if form_errors %}
+        <div class="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
+            <ul class="list-disc pl-5">
+                {% for err in form_errors %}
+                <li>{{ err }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %} {% if form_success %}
+        <div class="mb-4 p-3 rounded-md bg-green-50 border border-green-200 text-green-700 text-sm">
+            {{ form_success }}
+        </div>
+        {% endif %}
+
+        <div class="flex flex-col sm:flex-row items-end gap-4 mt-8">
+            <div class="flex-[2] w-full">
+                <label for="nameInput" class="text-lg font-medium text-gray-700">Child's Name</label>
+                <input
+                    id="nameInput"
+                    name="child_name"
+                    type="text"
+                    placeholder="Enter name"
+                    value="{{ form_data.child_name if form_data else '' }}"
+                    required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+            </div>
+            <div class="flex-1 w-full">
+                <label for="dobInput" class="text-lg font-medium text-gray-700">Date of Birth</label>
+                <input
+                    id="dobInput"
+                    name="dob"
+                    type="date"
+                    value="{{ form_data.dob if form_data else '' }}"
+                    required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+            </div>
+            <div class="flex flex-col gap-2 sm:gap-2 sm:flex-row sm:mt-4">
+                <button
+                    id="cancelEditBtn"
+                    type="button"
+                    class="w-full sm:w-auto bg-gray-300 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-400 transition duration-200 ease-in-out transform hover:scale-105 shadow-md hidden"
+                >
+                    Cancel
+                </button>
+                <button
+                    id="generateBtn"
+                    type="submit"
+                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md"
+                >
+                    Generate Schedule
+                </button>
+            </div>
+        </div>
+        <p id="errorMsg" class="error-text hidden text-sm mt-2">Please enter name and valid date.</p>
+    </form>
+</div>
+{% endblock %}
