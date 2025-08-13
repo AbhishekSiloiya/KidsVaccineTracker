@@ -15,7 +15,7 @@ Track children's vaccination schedules (IAP 2024 – India) with a Flask backend
 - PWA basics: `manifest.json`, `sw.js` (offline shell)
 - Consistent date formatting via Jinja filters
 
-## Tech Stack
+## 🧑‍💻 Tech Stack
 
 | Layer | Tech |
 |-------|------|
@@ -31,15 +31,19 @@ Track children's vaccination schedules (IAP 2024 – India) with a Flask backend
 
 ```powershell
 git clone https://github.com/AbhishekSiloiya/KidsVaccineTracker.git
+
 cd KidsVaccineTracker
+
 python -m venv .venv
+
 .\.venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
 
 # Optional: create .env
 "SECRET_KEY=dev-secret" | Out-File -Append .env
 
-python main.py   # http://127.0.0.1:5000/
+python main.py
 ```
 
 Default DB: `instance/children.db` (auto-created). Override with `DATABASE_URL` (or `SQLALCHEMY_DATABASE_URI`).
@@ -62,10 +66,9 @@ DATABASE_URL=sqlite:///instance/children.db
 Tools: `pytest`, `coverage`, `flake8`, `bandit`, `safety`.
 
 ```powershell
-pytest --cov=app --cov-report=term --cov-report=xml
+pytest
+
 flake8 app tests
-bandit -r app
-safety check -r requirements.txt
 ```
 
 Tests included:
@@ -139,15 +142,17 @@ gunicorn -w 2 -b 0.0.0.0:8000 main:app
 
 ## 🤝 Contributing
 
-1. Branch from `develop`
+1. Branch from `main`
 2. Add tests for new logic
 3. Run quality checks (tests, lint, security)
+    ```cmd
+    cd tests
+    pytest test_auth.py
+    pytest test_models.py
+    pytest test_schedule.py
+    ```
 4. Open PR with description & rationale
 
 ## 📄 License
 
-MIT (add `LICENSE` file if not yet present).
-
----
-
-Legacy static JS instructions removed. Use the Flask server workflow above.
+MIT.

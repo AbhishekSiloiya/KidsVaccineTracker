@@ -1,15 +1,8 @@
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 import os
-
-try:
-    # Local development convenience (python-dotenv)
-    from dotenv import load_dotenv  # type: ignore
-    load_dotenv()
-except Exception:
-    # If python-dotenv isn't installed, silently continue (production should set real env vars)
-    pass
+from dotenv import load_dotenv  # type: ignore
+load_dotenv()
 
 db = SQLAlchemy()
 
