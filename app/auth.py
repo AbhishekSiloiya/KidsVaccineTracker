@@ -12,7 +12,8 @@ def _current_parent():
 	pid = session.get('parent_id')
 	if not pid:
 		return None
-	return Parent.query.get(pid)
+	# SQLAlchemy 2.x: use Session.get instead of deprecated Query.get
+	return db.session.get(Parent, pid)
 
 
 def login_required(f):

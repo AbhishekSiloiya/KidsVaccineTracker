@@ -26,6 +26,20 @@ def create_app():
         instance_path = os.path.join(os.path.abspath(os.path.join(app.root_path, '..')), 'instance')
         os.makedirs(instance_path, exist_ok=True)
         db_url = 'sqlite:///' + os.path.join(instance_path, 'children.db').replace('\\', '/')
+    else:
+        # If user supplied a SQLite URL, ensure its directory exists and make relative paths absolute
+        if db_url.startswith('sqlite:///'):
+            raw_path = db_url.replace('sqlite:///', '', 1)
+            # Expand user (~) and environment vars
+            raw_path = os.path.expandvars(os.path.expanduser(raw_path))
+            if not os.path.isabs(raw_path):
+                # Treat relative paths as relative to the project root (one level above app package)
+                project_root = os.path.abspath(os.path.join(app.root_path, '..'))
+                raw_path = os.path.join(project_root, raw_path)
+            # Ensure parent directory exists
+            os.makedirs(os.path.dirname(raw_path), exist_ok=True)
+            # Reconstruct URI with normalized separators
+            db_url = 'sqlite:///' + raw_path.replace('\\', '/')
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 

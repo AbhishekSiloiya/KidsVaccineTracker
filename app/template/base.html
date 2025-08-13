@@ -16,8 +16,6 @@
         <meta name="theme-color" content="#3b82f6" />
         <meta name="description" content="Track your child's vaccination schedule with ease" />
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
-        <link rel="apple-touch-icon" href="{{ url_for('static', filename='assets/images/icon-192.png') }}" />
-        <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/images/icon-192.png') }}" />
         {% block extra_head %}{% endblock %}
     </head>
     <body class="gradient-bg min-h-screen pb-8 vt-body">
@@ -96,10 +94,6 @@
             {% block content %}{% endblock %}
         </div>
 
-        {% block scripts %}
-        <script src="{{ url_for('static', filename='js/storage.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/app.js') }}"></script>
-        {% endblock %}
+        {% block scripts %} {% endblock %}
     </body>
 </html>

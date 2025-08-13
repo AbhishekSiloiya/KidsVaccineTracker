@@ -1,4 +1,4 @@
-# VaccinationTracker Testing & Change Management Summary
+# VaccinationTracker Testing & Quality Summary (Flask / Python)
 
 ## 🎯 Overview
 
@@ -45,123 +45,109 @@ This document summarizes the comprehensive testing and change management system 
 
 ## 🧪 Testing Framework
 
-### 1. **Testing Stack**
+### 1. **Testing Stack (Current)**
 
 **Core Technologies**:
-- ✅ **Jest**: JavaScript testing framework
-- ✅ **jsdom**: Browser environment simulation
-- ✅ **ESLint**: Code quality and consistency
-- ✅ **GitHub Actions**: Automated CI/CD pipeline
+- ✅ **pytest**: Unit & integration testing
+- ✅ **coverage.py**: Coverage measurement (XML + terminal)
+- ✅ **flake8**: Linting & style enforcement
+- ✅ **bandit**: Static security analysis
+- ✅ **safety**: Dependency vulnerability scanning
+- ✅ **GitHub Actions**: Automated CI/CD (Python matrix)
 
-**Test Types**:
-- ✅ **Unit Tests**: Individual function/class testing
-- ✅ **Integration Tests**: Component interaction testing
-- ✅ **Coverage Reports**: Code coverage analysis
-- ✅ **Linting**: Code quality checks
+**Test Types Implemented**:
+- ✅ **Model Tests** (relationships, cascade delete)
+- ✅ **Schedule Logic Tests** (date calculation, status classification)
+- ✅ **Auth Flow Test** (register + login basic path)
+- ⏳ **View / Endpoint Tests** (to expand: dashboard stats, marking completion)
+- ⏳ **Error Handling Tests** (planned)
 
 ### 2. **Test Structure**
 
 ```
 tests/
-├── setup.js              # Jest configuration and mocks
-├── validation.test.js    # Unit tests for validation
-├── storage.test.js       # Unit tests for storage
-├── integration.test.js   # Integration tests
-├── working.test.js       # Framework verification tests
-├── run-tests.js          # Custom test runner
-└── README.md            # Comprehensive documentation
+├── conftest.py          # Pytest fixtures (Flask app + in-memory DB)
+├── test_schedule.py     # Schedule date & status logic
+├── test_models.py       # Parent/Child/Vaccination + cascade
+├── test_auth.py         # Registration & login flow
+└── (planned) test_views.py / test_completion.py
 ```
 
 ### 3. **Test Coverage**
 
-**Target Coverage**: >80% for all metrics
-- **Statements**: 80%
-- **Branches**: 80%
-- **Functions**: 80%
-- **Lines**: 80%
+**Initial Target Coverage**: ≥50% (bootstrap phase) – raise incrementally to 70% then 80%.
 
-**Coverage Areas**:
-- ✅ **Validation Logic**: Name, date, completion validation
-- ✅ **Storage Operations**: CRUD operations, import/export
-- ✅ **Business Logic**: Vaccination schedule calculations
-- ✅ **Error Handling**: Edge cases and error scenarios
-- ✅ **UI Interactions**: DOM manipulation and events
+**Current Covered Areas**:
+- ✅ Schedule computation (_calc_due_date logic via build wrapper)
+- ✅ Vaccination row creation + cascade delete
+- ✅ Basic auth (register/login)
+
+**Planned Coverage Additions**:
+- Dashboard aggregation counts (overdue vs due soon vs upcoming)
+- Vaccination completion endpoint (/child/<id>/complete)
+- Date formatting filters (friendly_date, short_date)
+- Negative & edge cases: invalid registration, duplicate email, future DOB rejection
 
 ## 🔧 Automated Testing Pipeline
 
 ### 1. **GitHub Actions Workflow** (`.github/workflows/ci.yml`)
 
 **Automated Jobs**:
-1. **Test Job**: Runs tests on multiple Node.js versions
-2. **Security Job**: Runs security audits
-3. **Build Job**: Creates release artifacts
-4. **Deploy Job**: Deploys to GitHub Pages
+1. **lint_test**: Matrix (3.10/3.11/3.12) – install, flake8, pytest + coverage
+2. **security**: bandit + safety scans
+3. **build**: Package tar.gz artifact (main branch only)
+4. **release**: GitHub Release (main branch only)
+5. **notify**: Outcome summary
 
 **Triggers**:
-- Push to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
+- Push / PR to `main` & `develop` (tests + security)
+- Push to `main` (build + release)
 
 ### 2. **Quality Gates**
 
-**Pre-deployment Checks**:
-- ✅ All tests must pass
-- ✅ Code coverage thresholds met
-- ✅ No security vulnerabilities
-- ✅ Linting rules satisfied
+**Quality Gates (current)**:
+- ✅ Tests must execute (workflow fails if zero tests)
+- ✅ Lint runs (non-blocking yet: flake8 warnings allowed)
+- ✅ Security scans (non-blocking; planned to tighten)
+- ⏳ Coverage enforcement (to add via `--cov-fail-under` once baseline established)
 
-**Post-deployment**:
-- ✅ Automated release creation
-- ✅ GitHub Pages deployment
-- ✅ Notification system
+**Planned Gate Tightening**:
+- Add `pytest --cov-fail-under=<threshold>` as coverage stabilizes
+- Treat bandit high findings as failure (after triage)
+- Enforce flake8 clean (remove `|| true` bypass)
 
 ## 📊 Test Results & Metrics
 
-### 1. **Current Test Status**
+### 1. **Current Test Status (Python)**
 
-**Framework Tests**: ✅ 12/14 passing
-- Basic Jest functionality
-- Browser environment mocks
-- Validation logic
-- Storage operations
-- Vaccination schedule logic
-- Calendar export functionality
+Initial suite added – small but functional baseline:
+- test_schedule.py: core date/status validations
+- test_models.py: relationship integrity & cascade
+- test_auth.py: happy path registration & login
 
-**Test Categories**:
-- **Unit Tests**: 59 test cases (validation + storage)
-- **Integration Tests**: 12 test scenarios
-- **Framework Tests**: 14 verification tests
+Pending additions will broaden behavior & error coverage.
 
 ### 2. **Code Quality Metrics**
 
-**ESLint Rules**:
-- ✅ Error handling best practices
-- ✅ Code quality standards
-- ✅ Naming conventions
-- ✅ ES6+ features
-- ✅ Accessibility considerations
+**flake8 Rules Focus**:
+- Import cleanliness, unused vars
+- Complexity & style (PEP8)
+- Readability for future contributors
 
-**Performance Targets**:
-- Unit tests: < 1 second per test
-- Integration tests: < 5 seconds per test
-- Full test suite: < 30 seconds
+**Performance Targets (initial)**:
+- Full suite < 5 seconds (in-memory SQLite)
+- Remain < 15 seconds as tests grow (< 60s upper bound CI)
 
 ## 🚀 Development Workflow
 
-### 1. **Adding New Features**
+### 1. **Adding New Features (Updated Expectations)**
 
-**Process**:
-1. Create feature branch from `develop`
-2. Implement feature with tests
-3. Run test suite locally
-4. Create pull request
-5. Automated testing runs
-6. Code review and merge
-
-**Testing Requirements**:
-- ✅ Unit tests for new functions
-- ✅ Integration tests for new features
-- ✅ Update documentation
-- ✅ Maintain coverage thresholds
+1. Branch from `develop`
+2. Add/extend tests first (TDD encouraged) for new route/model logic
+3. Implement feature
+4. Run `pytest --cov=app` locally
+5. Ensure no regressions / style violations
+6. Open PR – CI validates across Python versions
 
 ### 2. **Bug Fixes**
 
@@ -218,45 +204,37 @@ tests/
 
 ## 🛠️ Tools & Commands
 
-### 1. **Development Commands**
+### 1. **Development Commands (Python)**
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
+# Install (dev)
+pip install -r requirements.txt
 
 # Run tests with coverage
-npm run test:coverage
+pytest --cov=app --cov-report=term --cov-report=xml
 
-# Run linting
-npm run lint
+# Lint
+flake8 app tests
 
-# Run validation (linting + tests)
-npm run validate
-
-# Custom test runner
-node tests/run-tests.js [options]
+# Security scans
+bandit -r app
+safety check -r requirements.txt
 ```
 
-### 2. **Test Runner Options**
+### 2. **Pytest Useful Flags**
 
 ```bash
-# Run all tests
-node tests/run-tests.js
+# Stop after first failure
+pytest -x
 
-# Run only unit tests
-node tests/run-tests.js --unit
+# Verbose
+pytest -vv
 
-# Run only integration tests
-node tests/run-tests.js --integration
+# Run a subset
+pytest tests/test_schedule.py::test_week_calculation
 
-# Run with coverage
-node tests/run-tests.js --coverage
-
-# Run only linting
-node tests/run-tests.js --lint
+# Show 10 slowest tests
+pytest --durations=10
 ```
 
 ## 📚 Documentation
@@ -338,7 +316,7 @@ node tests/run-tests.js --lint
 
 ---
 
-## ✅ Summary
+## ✅ Summary (Updated)
 
 The VaccinationTracker project now has a **comprehensive testing and change management system** that ensures:
 
@@ -348,4 +326,4 @@ The VaccinationTracker project now has a **comprehensive testing and change mana
 4. **Scalability**: Framework supports future growth
 5. **Transparency**: Complete change tracking
 
-This system provides a **solid foundation** for continued development while maintaining high code quality and preventing regressions. The automated pipeline ensures that all changes are properly tested before deployment, giving confidence in the application's reliability. 
+The system now reflects a Python-centric stack. As tests expand (views, edge cases, error paths), enforcement (coverage threshold, stricter lint & security gating) will tighten to maintain reliability.

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from . import db
 
 
@@ -9,7 +9,7 @@ class Parent(db.Model):
     age = db.Column(db.Integer, nullable=True)
     email = db.Column(db.String(180), unique=True, nullable=False, index=True)
     password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     children = db.relationship('Child', back_populates='parent', cascade='all, delete-orphan')
 
@@ -23,7 +23,7 @@ class Child(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('parents.id', ondelete='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationship to Vaccination records
     vaccinations = db.relationship('Vaccination', back_populates='child', cascade='all, delete-orphan')
@@ -40,7 +40,7 @@ class Vaccination(db.Model):
     name = db.Column(db.String(150), nullable=False)
     due_date = db.Column(db.Date, nullable=False)
     completed_at = db.Column(db.Date, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     child = db.relationship('Child', back_populates='vaccinations')
 

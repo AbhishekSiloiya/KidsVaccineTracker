@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, session, flash
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from .models import Child, Vaccination, Parent
 from . import db
 from .schedule_data import build_schedule_for_child
@@ -231,7 +231,8 @@ def download_child_calendar(child_id):
         # One event per age group (listing vaccines) to keep calendar concise
         summary = f"{entry['age']} Vaccines"
         description = ', '.join(entry['vaccines'])
-        dtstamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+        # Timezone-aware UTC timestamp (deprecated utcnow replaced)
+        dtstamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
         dtstart = due.strftime('%Y%m%d')  # all-day
         uid = f"{child.id}-{entry['age'].replace(' ', '')}-{dtstart}@vaccinationtracker"
         lines.extend([
