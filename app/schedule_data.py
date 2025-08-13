@@ -83,7 +83,8 @@ def build_schedule_for_child(dob: date, child=None):
             status_class = 'status-completed'
             status_text = 'Completed'
         else:
-            if due < today:
+            # Treat vaccines whose due date is today as due (previously strictly < today left same-day items as Upcoming)
+            if due <= today:
                 status_class = 'status-due'
                 status_text = 'Due / Overdue'
             else:

@@ -1,82 +1,25 @@
-/* Custom styles for VaccinationTracker */
+/* Core custom styles for VaccinationTracker */
 body {
     font-family: "Inter", sans-serif;
-}
-
-/* Top action buttons responsive tweaks (clean) */
-@media (max-width: 480px) {
-    #topActions {
-        flex-wrap: nowrap !important;
-        gap: 0.4rem !important;
-        overflow-x: auto;
-        scrollbar-width: none;
-        padding-top: 0.25rem;
-        white-space: nowrap; /* prevent wrapping */
-        align-items: center;
-    }
-    #topActions::-webkit-scrollbar {
-        display: none;
-    }
-    #topActions > div {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        gap: 0.4rem !important;
-        width: auto !important;
-    }
-    #topActions > div:last-child {
-        margin-left: auto;
-    }
-    #topActions .flex.items-center.gap-2,
-    #topActions .flex.items-center.gap-2.flex-wrap {
-        width: auto !important;
-        flex-direction: row !important;
-    }
-    #topActions a {
-        width: auto !important;
-        flex: 0 0 auto !important;
-        padding: 0.42rem 0.65rem !important;
-        border-width: 1px !important;
-        border-radius: 11px !important;
-        display: inline-flex !important;
-        align-items: center;
-        justify-content: center;
-        gap: 0.35rem;
-        font-size: 0.7rem !important;
-        line-height: 1 !important;
-    }
-    /* Keep text for first group (Dashboard / Add Child) */
-    #topActions > div:first-child a {
-        font-size: 0.8rem !important;
-    }
-    /* Profile + Logout: icon only, no border/fill */
-    #topActions a[href*="/auth/parent/"],
-    #topActions a[href*="/auth/logout"] {
-        background: transparent !important;
-        border: none !important;
-        padding: 0.3rem 0.4rem !important;
-        font-size: 0 !important;
-    }
-    #topActions a .material-symbols-outlined {
-        font-size: 20px !important;
-        line-height: 1 !important;
-    }
-    #topActions a[href*="/auth/parent/"] .material-symbols-outlined,
-    #topActions a[href*="/auth/logout"] .material-symbols-outlined {
-        font-size: 24px !important;
-    }
-    #topActions a:hover {
-        transform: translateY(-2px);
-        transition: transform 0.18s ease;
-    }
 }
 
 .gradient-bg {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-#topActions {
+/* Layout wrappers */
+.vt-top-actions {
     margin-top: 1rem;
-    flex-direction: row !important;
+}
+.vt-top-actions-left,
+.vt-top-actions-right {
+    display: flex;
+}
+.vt-nav-btn {
+    transition: background-color 0.2s ease, transform 0.18s ease;
+}
+.vt-nav-btn:hover {
+    transform: translateY(-2px);
 }
 
 /* Combined card for welcome and input */
@@ -269,76 +212,4 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-/* Mobile-specific improvements for sleek design */
-@media (max-width: 640px) {
-    /* Better vaccine text display */
-    .schedule-card .text-xs.text-gray-700.whitespace-nowrap.hidden.sm\:block {
-        white-space: normal !important;
-        display: block !important;
-        font-size: 0.7rem !important;
-        line-height: 1.3 !important;
-        margin-top: 0.25rem !important;
-        color: #6b7280 !important;
-    }
-
-    /* Improve button spacing */
-    .schedule-card .mark-btn {
-        margin-top: 0.5rem !important;
-        width: 100% !important;
-        text-align: center !important;
-        padding: 0.4rem 0.6rem !important;
-        font-size: 0.8rem !important;
-    }
-
-    /* Better form spacing */
-    .schedule-card .complete-form {
-        margin-top: 0.5rem !important;
-    }
-
-    .schedule-card .complete-form input {
-        width: 100% !important;
-        margin-bottom: 0.25rem !important;
-        padding: 0.4rem !important;
-        font-size: 0.8rem !important;
-    }
-
-    .schedule-card .complete-form button {
-        width: 100% !important;
-        padding: 0.4rem 0.6rem !important;
-        font-size: 0.8rem !important;
-    }
-
-    /* Compact card shadows */
-    .combined-card,
-    .schedule-card {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08) !important;
-    }
-
-    /* Better spacing for child info */
-    .flex.items-center.gap-2.flex-wrap > div {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 0.1rem !important;
-    }
-
-    /* Compact expand icon */
-    .expand-icon {
-        width: 1rem !important;
-        height: 1rem !important;
-    }
-
-    /* Better due date display */
-    .due-date {
-        font-size: 0.7rem !important;
-    }
-
-    /* Compact completed date */
-    .completed-date {
-        font-size: 0.7rem !important;
-    }
-
-    /* Better detail display */
-    .detail-due {
-        font-size: 0.7rem !important;
-    }
-}
+/* (Intentionally slimmed; detailed mobile tweaks consolidated in responsive.css) */

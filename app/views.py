@@ -8,6 +8,31 @@ from .schedule_data import build_schedule_for_child
 # If you later rename the folder to 'templates', you can remove the parameter.
 views = Blueprint('views', __name__, template_folder='template')
 
+@views.app_template_filter('friendly_date')
+def friendly_date(value):
+    """Format a date as 'Weekday, DD/MM/YYYY'. Returns empty string if value falsy."""
+    if not value:
+        return ''
+    # Ensure we have a date object
+    if isinstance(value, datetime):
+        value = value.date()
+    try:
+        return value.strftime('%A, %d/%m/%Y')
+    except Exception:
+        return str(value)
+
+@views.app_template_filter('short_date')
+def short_date(value):
+    """Format a date as 'DD/MM/YYYY' (no weekday)."""
+    if not value:
+        return ''
+    if isinstance(value, datetime):
+        value = value.date()
+    try:
+        return value.strftime('%d/%m/%Y')
+    except Exception:
+        return str(value)
+
 @views.route('/')
 def home():
     # Render the base layout so linked CSS/JS are requested and applied
@@ -74,8 +99,9 @@ def dashboard():
     for c in children:
         vacs = Vaccination.query.filter_by(child_id=c.id).all()
         completed = sum(1 for v in vacs if v.completed_at)
-        overdue = sum(1 for v in vacs if (not v.completed_at) and v.due_date < today)
-        due_soon = sum(1 for v in vacs if (not v.completed_at) and today <= v.due_date <= due_soon_window)
+        # Treat vaccinations due today as overdue/due rather than "due soon" for consistency with schedule cards
+        overdue = sum(1 for v in vacs if (not v.completed_at) and v.due_date <= today)
+        due_soon = sum(1 for v in vacs if (not v.completed_at) and today < v.due_date <= due_soon_window)
         upcoming = sum(1 for v in vacs if (not v.completed_at) and v.due_date > due_soon_window)
         total = len(vacs)
         # Next due date among not completed
@@ -124,8 +150,8 @@ def child_view(child_id):
         due_soon_window = today + timedelta(days=30)
         stats = {
             'completed': sum(1 for v in vacs if v.completed_at),
-            'overdue': sum(1 for v in vacs if (not v.completed_at) and v.due_date < today),
-            'due_soon': sum(1 for v in vacs if (not v.completed_at) and today <= v.due_date <= due_soon_window),
+            'overdue': sum(1 for v in vacs if (not v.completed_at) and v.due_date <= today),
+            'due_soon': sum(1 for v in vacs if (not v.completed_at) and today < v.due_date <= due_soon_window),
             'total': len(vacs),
         }
     today_str = date.today().strftime('%Y-%m-%d')

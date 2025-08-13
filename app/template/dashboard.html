@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block title %}Dashboard - VaccinationTracker{% endblock %} {% block content %}
-<div id="profilesDashboard" class="dashboard max-w-[800px] mx-auto">
+<div id="profilesDashboard" class="dashboard max-w-[800px] mx-auto vt-dashboard">
     <!-- <div class="flex items-center justify-between mb-3">
         <h2 class="text-xl font-bold text-gray-800">Children Schedule</h2>
         <div class="flex items-center gap-2">
@@ -23,37 +23,37 @@
     </div> -->
 
     <!-- Stats overview -->
-    <div class="stats-grid">
-        <div class="stat-card">
+    <div class="stats-grid vt-stats-grid">
+        <div class="stat-card vt-stat-card">
             <div class="stat-title">Total Children</div>
             <div id="statTotal" class="stat-value">{{ children|length }}</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card vt-stat-card">
             <div class="stat-title">Completed</div>
             <div id="statCompleted" class="stat-value">{{ overall_completed }}</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card vt-stat-card">
             <div class="stat-title">Overdue</div>
             <div id="statOverdue" class="stat-value text-red-600">{{ overall_overdue }}</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card vt-stat-card">
             <div class="stat-title">Upcoming / Due Soon</div>
             <div id="statUpcoming" class="stat-value text-blue-600">{{ overall_upcoming }}</div>
         </div>
     </div>
 
     <!-- Profiles list -->
-    <div id="profilesList" class="space-y-2 mt-4">
+    <div id="profilesList" class="space-y-2 mt-4 vt-profiles-list">
         {% if not children %}
         <div class="text-sm text-gray-600 p-3">No profiles yet. Add a child to get started.</div>
         {% else %} {% for s in child_stats %}
-        <div class="profile-card">
+        <div class="profile-card vt-profile-card">
             <div class="flex !w-full flex-col">
                 <div class="flex items-center justify-between gap-2 flex-wrap">
                     <div class="flex gap-4 items-baseline">
                         <span class="!text-2xl font-semibold text-gray-800">{{ s.child.name }}</span>
                         <span class="!text-sm text-gray-600"
-                            ><strong>Born:</strong> {{ s.child.dob.strftime('%Y-%m-%d') }}</span
+                            ><strong>Born:</strong> {{ s.child.dob|friendly_date }}</span
                         >
                     </div>
                     <div class="flex items-center gap-2">
@@ -73,7 +73,7 @@
                 </div>
                 <div class="mt-3 bg-blue-50 text-blue-900 rounded-md p-3">
                     <div class="text-sm">
-                        <strong>Next Due:</strong> {{ s.next_due.strftime('%A, %m/%d/%Y') if s.next_due else 'N/A' }}
+                        <strong>Next Due:</strong> {{ s.next_due|friendly_date if s.next_due else 'N/A' }}
                     </div>
                     <div class="text-lg">
                         {{ s.next_due_vaccines|join(', ') if s.next_due_vaccines else 'All done' }}

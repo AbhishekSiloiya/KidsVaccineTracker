@@ -1,7 +1,13 @@
 {% extends 'base.html' %} {% block title %}Add Child - VaccinationTracker{% endblock %} {% block content %}
 <!-- Add Child Form Only -->
-<div id="inputCard" class="combined-card mb-6">
-    <form id="addChildForm" method="POST" action="{{ url_for('views.add_child') }}" novalidate>
+<div id="inputCard" class="combined-card mb-6 vt-add-child-card">
+    <form
+        id="addChildForm"
+        method="POST"
+        action="{{ url_for('views.add_child') }}"
+        novalidate
+        class="vt-add-child-form"
+    >
         <h2 class="text-2xl font-bold text-gray-800 mb-1">Add a Child</h2>
         <p class="text-gray-600 my-4">Enter your child's details to generate a personalized vaccination schedule.</p>
 
@@ -19,7 +25,7 @@
         </div>
         {% endif %}
 
-        <div class="flex flex-col sm:flex-row items-end gap-4 mt-8">
+        <div class="flex flex-col sm:flex-row items-end gap-4 mt-8 vt-form-row">
             <div class="flex-[2] w-full">
                 <label for="nameInput" class="text-lg font-medium text-gray-700">Child's Name</label>
                 <input
@@ -29,7 +35,7 @@
                     placeholder="Enter name"
                     value="{{ form_data.child_name if form_data else '' }}"
                     required
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none vt-input-text"
                 />
             </div>
             <div class="flex-1 w-full">
@@ -40,21 +46,21 @@
                     type="date"
                     value="{{ form_data.dob if form_data else '' }}"
                     required
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none vt-input-date"
                 />
             </div>
-            <div class="flex flex-col gap-2 sm:gap-2 sm:flex-row sm:mt-4">
+            <div class="flex flex-1 flex-col gap-2 flex-row mt-4 w-full whitespace-nowrap">
                 <button
                     id="cancelEditBtn"
                     type="button"
-                    class="w-full sm:w-auto bg-gray-300 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-400 transition duration-200 ease-in-out transform hover:scale-105 shadow-md hidden"
+                    class="w-full bg-gray-300 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-400 transition duration-200 ease-in-out transform hover:scale-105 shadow-md hidden"
                 >
                     Cancel
                 </button>
                 <button
                     id="generateBtn"
                     type="submit"
-                    class="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md"
+                    class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md"
                 >
                     Generate Schedule
                 </button>

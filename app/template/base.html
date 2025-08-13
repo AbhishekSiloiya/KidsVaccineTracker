@@ -20,20 +20,20 @@
         <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/images/icon-192.png') }}" />
         {% block extra_head %}{% endblock %}
     </head>
-    <body class="gradient-bg min-h-screen pb-8">
-        <div class="mx-auto px-8">
+    <body class="gradient-bg min-h-screen pb-8 vt-body">
+        <div class="mx-auto px-[1.5rem] vt-layout">
             <!-- Top Actions -->
-            <div id="topActions" class="flex justify-between items-center mb-4">
-                <div class="flex items-center gap-2 flex-wrap">
+            <div id="topActions" class="flex justify-between items-center mb-4 vt-top-actions">
+                <div class="flex items-center gap-2 flex-wrap vt-top-actions-left vt-actions-group">
                     <a
                         href="{{ url_for('views.dashboard') }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> dashboard </span> Dashboard
                     </a>
                     <a
                         href="{{ url_for('views.add_child') }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> person_add </span> Add Child
                     </a>
@@ -41,34 +41,36 @@
 
                 <div>
                     {% if current_parent %}
-                    <span class="hidden md:inline text-2xl text-gray-600 mr-1">Hi {{ current_parent.name }}</span>
+                    <span class="profile-welcome inline text-[1.6rem] text-gray-600 mr-1"
+                        >Hi {{ current_parent.name }}</span
+                    >
                     {% endif %}
                 </div>
 
-                <div class="flex items-center gap-2 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap vt-top-actions-right vt-actions-group">
                     {% if current_parent %}
                     <a
                         href="{{ url_for('auth.parent_profile', parent_id=current_parent.id) }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> account_circle </span> Profile
                     </a>
                     <a
                         href="{{ url_for('auth.logout') }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> logout </span> Logout
                     </a>
                     {% else %}
                     <a
                         href="{{ url_for('auth.login') }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> login </span> Login
                     </a>
                     <a
                         href="{{ url_for('auth.register') }}"
-                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium vt-nav-btn"
                     >
                         <span class="material-symbols-outlined text-2xl"> how_to_reg </span> Register
                     </a>
@@ -77,15 +79,15 @@
             </div>
 
             <!-- Header -->
-            <header class="text-center mb-8">
-                <h1 class="text-5xl font-bold text-gray-800 mb-4">Child Vaccination Tracker</h1>
-                <div class="flex justify-between items-center max-w-[720px] mx-auto">
+            <header class="text-center mb-8 vt-header">
+                <h1 class="text-5xl font-bold text-gray-800 mb-4 vt-page-title">Child Vaccination Tracker</h1>
+                <div class="flex justify-between items-center max-w-[720px] mx-auto vt-container-narrow">
                     <a
                         href="https://iapindia.org/pdf/Indian-Pediatrics/2024/Indian-Pediatrics-February-2024-issue.pdf"
-                        class="text-gray-600 text-lg hover:underline"
+                        class="text-gray-600 text-lg hover:underline vt-subtitle"
                         >Based on IAP 2024 Schedule</a
                     >
-                    <p class="text-lg font-medium text-gray-700 m-0 p-0">
+                    <p class="text-lg font-medium text-gray-700 m-0 p-0 vt-subtitle">
                         Country: <span class="font-semibold text-gray-800">India</span>
                     </p>
                 </div>
