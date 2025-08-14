@@ -51,6 +51,20 @@
                 >Logout</a
             >
         </div>
+        <div class="mt-6">
+            <form
+                method="POST"
+                action="{{ url_for('auth.delete_account', parent_id=parent.id) }}"
+                onsubmit="return confirm('This will permanently delete your account, all children, and all vaccination records. This action cannot be undone. Continue?');"
+            >
+                <button
+                    type="submit"
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 w-full sm:w-auto"
+                >
+                    Delete Account
+                </button>
+            </form>
+        </div>
     </form>
 </div>
 {% endblock %}

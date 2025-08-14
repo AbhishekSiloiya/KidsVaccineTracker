@@ -114,3 +114,19 @@ def parent_profile(parent_id):
 @auth.app_context_processor
 def inject_parent():
 	return {'current_parent': _current_parent()}
+
+
+@auth.route('/parent/<int:parent_id>/delete', methods=['POST'])
+@login_required
+def delete_account(parent_id):
+	"""Permanently delete the current parent's account and all related data."""
+	parent = _current_parent()
+	if not parent or parent.id != parent_id:
+		flash('Unauthorized request.', 'error')
+		return redirect(url_for('auth.login'))
+	# Delete the parent; cascades handle children and vaccinations
+	db.session.delete(parent)
+	db.session.commit()
+	session.pop('parent_id', None)
+	flash('Your account and all associated data have been permanently deleted.', 'success')
+	return redirect(url_for('auth.login'))
