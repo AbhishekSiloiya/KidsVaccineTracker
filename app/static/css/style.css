@@ -213,3 +213,109 @@ body {
     background: #a8a8a8;
 }
 /* (Intentionally slimmed; detailed mobile tweaks consolidated in responsive.css) */
+
+/* Floating Action Button (FAB) */
+.vt-fab {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.fab-btn {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 1rem;
+    /* background: #3b82f6;
+    color: #fff; */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+.fab-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 14px 18px rgba(0, 0, 0, 0.18);
+    /* background: #2563eb; */
+}
+.fab-btn .material-symbols-outlined {
+    font-size: 28px;
+}
+
+.fab-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.fab-menu.hidden {
+    display: none;
+}
+
+.fab-menu-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.fab-item {
+    font-size: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+    padding: 0.6rem 0.8rem;
+    border-radius: 12px;
+    text-decoration: none;
+    min-width: 180px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+.fab-item:hover {
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+    background: oklch(96.7% 0.003 264.542);
+}
+.fab-item .material-symbols-outlined {
+    font-size: 1.5rem;
+    color: oklch(51.1% 0.262 276.966);
+}
+.fab-item .label {
+    font-weight: 600;
+}
+
+/* Subtle appear animation */
+.fab-menu.open .fab-item {
+    animation: vtFadeUp 160ms ease-out both;
+}
+.fab-menu.open .fab-item:nth-child(1) {
+    animation-delay: 0ms;
+}
+.fab-menu.open .fab-item:nth-child(2) {
+    animation-delay: 40ms;
+}
+.fab-menu.open .fab-item:nth-child(3) {
+    animation-delay: 80ms;
+}
+.fab-menu.open .fab-item:nth-child(4) {
+    animation-delay: 120ms;
+}
+
+@keyframes vtFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

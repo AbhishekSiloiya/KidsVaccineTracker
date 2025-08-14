@@ -33,6 +33,43 @@ def short_date(value):
     except Exception:
         return str(value)
 
+@views.app_template_filter('age_text')
+def age_text(value):
+    """Return human-friendly age text based on DOB: weeks (<1 month), months (<1 year), then years."""
+    if not value:
+        return ''
+    # Normalize to date
+    if isinstance(value, datetime):
+        value = value.date()
+    if not isinstance(value, date):
+        return ''
+    today = date.today()
+    # Guard future dates
+    if value > today:
+        days_until = (value - today).days
+        return f"{days_until} days to due date"
+
+    days = (today - value).days
+    # Less than a month -> show weeks (min 1 week to avoid 0)
+    if days < 30:
+        weeks = max(1, days // 7)
+        return f"{weeks} {'week' if weeks == 1 else 'weeks'} old"
+
+    # Less than a year -> show months
+    months = (today.year - value.year) * 12 + (today.month - value.month)
+    if today.day < value.day:
+        months -= 1
+    if months < 12:
+        months = max(1, months)
+        return f"{months} {'month' if months == 1 else 'months'} old"
+
+    # Otherwise show years
+    years = today.year - value.year
+    if (today.month, today.day) < (value.month, value.day):
+        years -= 1
+    years = max(0, years)
+    return f"{years} {'year' if years == 1 else 'years'} old"
+
 @views.route('/')
 def home():
     # Render the base layout so linked CSS/JS are requested and applied

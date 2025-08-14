@@ -166,7 +166,7 @@ playwright-report/
 # Python/App
 *.pyc
 *__pycache__/
-tests/.pytest_cache
+*.pytest_cache
 
 # Database
 instance/

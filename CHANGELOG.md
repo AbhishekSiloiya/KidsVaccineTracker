@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - Better Profile management
+- Try out a new Hamburger style navigation
+- Add Vaccination for UK
+- Allow users to add one child without login
+- Add comparison between Indian and UK vaccination schedule
+- Change the Overdue/Due Soon/Completed to be filters
 
 ### Added
 - ✅ A Flask Webapp

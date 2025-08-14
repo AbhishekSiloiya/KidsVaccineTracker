@@ -1,18 +1,19 @@
 {% extends 'base.html' %} {% block title %}Child Profile - VaccinationTracker{% endblock %} {% block content %}
 <div class="combined-card mb-6 vt-child-profile-card vt-card-primary">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Child Profile</h2>
+    <!-- <h2 class="text-2xl font-bold text-gray-800 mb-4">Child Profile</h2> -->
     {% if child %}
     <div class="flex flex-col gap-4 vt-child-profile" x-data="{editing: false}">
         <span id="editMeta" data-open-edit="{% if editing %}1{% else %}0{% endif %}" class="hidden"></span>
-        <div class="flex justify-between items-baseline">
-            <div>
-                <p class="text-sm text-gray-500">Name</p>
-                <p class="!text-3xl font-semibold text-gray-800">{{ child.name }}</p>
-            </div>
-            <div>
-                <p class="text-sm text-gray-500">Date of Birth</p>
-                <p class="text-xl text-gray-700">{{ child.dob|short_date }}</p>
-            </div>
+        <div class="flex flex-col justify-center items-center vt-childInfo gap-[0.5rem]">
+            <!-- <div> -->
+            <!-- <p class="text-sm text-gray-500">Name</p> -->
+            <p class="text-3xl font-semibold text-gray-800">{{ child.name }}</p>
+            <!-- </div>
+            <div> -->
+            <!-- <p class="text-sm text-gray-500">Date of Birth</p> -->
+            <p class="text-xl text-gray-700">Born on: {{ child.dob|short_date }}</p>
+            <p class="text-xl text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full">{{ child.dob|age_text }}</p>
+            <!-- </div> -->
         </div>
         <div class="flex flex-col gap-2 w-full">
             <a
@@ -24,7 +25,7 @@
                 <span class="material-symbols-outlined">calendar_apps_script</span>
                 Download Calendar
             </a>
-            <div class="flex flex-wrap items-center justify-between gap-3 mt-1">
+            <div class="flex flex-wrap items-center justify-between gap-3 mt-1 vt-totalstats">
                 <div class="flex flex-wrap gap-2">
                     {% if stats and stats.total is defined %}
                     <span
@@ -116,7 +117,7 @@
             <div class="flex items-center gap-4 schedule-card-info vt-schedule-card-info vt-schedule-meta">
                 <span class="{{ entry.status_class }}">{{ entry.status_text }}</span>
                 <div>
-                    <p class="font-semibold text-gray-800 text-base">{{ entry.age }}</p>
+                    <p class="font-semibold text-gray-800 text-base vt-vaccine-age">{{ entry.age }}</p>
                     <p class="text-xs text-gray-600 whitespace-nowrap due-date">
                         Due: {{ entry.due_date|friendly_date if entry.due_date else 'N/A' }}
                     </p>
