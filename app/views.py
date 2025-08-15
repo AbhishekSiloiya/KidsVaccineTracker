@@ -95,11 +95,7 @@ def _validate_child_form(name: str, dob_str: str):
 
 @views.route('/add-child', methods=['GET', 'POST'])
 def add_child():
-    # Require login
     parent_id = session.get('parent_id')
-    if not parent_id:
-        flash('Please log in first.', 'error')
-        return redirect(url_for('auth.login'))
     form_errors = []
     form_success = None
     form_data = {}
@@ -109,20 +105,158 @@ def add_child():
         form_data = {'child_name': name, 'dob': dob}
         form_errors = _validate_child_form(name, dob)
         if not form_errors:
-            # Persist child
-            child = Child(name=name, dob=datetime.strptime(dob, '%Y-%m-%d').date(), parent_id=parent_id)
-            db.session.add(child)
-            db.session.commit()
-            form_success = 'Child added successfully.'
-            # Optional redirect: return redirect(url_for('views.dashboard'))
+            if parent_id:
+                # Persist child in DB for logged-in parent
+                child = Child(name=name, dob=datetime.strptime(dob, '%Y-%m-%d').date(), parent_id=parent_id)
+                db.session.add(child)
+                db.session.commit()
+                form_success = 'Child added successfully.'
+            else:
+                # Guest flow: allow only one child in session; block adding a second
+                if session.get('guest_child'):
+                    flash('Adding more than one child requires an account. Please register or log in.', 'error')
+                    return redirect(url_for('auth.register'))
+                session['guest_child'] = {'name': name, 'dob': dob}
+                # Redirect to guest child view so they can manage schedule
+                return redirect(url_for('views.guest_child_view'))
+    else:
+        # GET: if guest child exists, prefill and show preview
+        if not parent_id and session.get('guest_child'):
+            gc = session['guest_child']
+            form_data = {'child_name': gc.get('name') or '', 'dob': gc.get('dob') or ''}
     return render_template('add_child.html', form_errors=form_errors, form_success=form_success, form_data=form_data)
+
+
+@views.route('/guest-child')
+def guest_child_view():
+    guest = session.get('guest_child')
+    if not guest:
+        flash('Add a temporary child first.', 'info')
+        return redirect(url_for('views.add_child'))
+    name = guest.get('name') or ''
+    dob_str = guest.get('dob') or ''
+    try:
+        dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
+    except Exception:
+        flash('Invalid temporary child data. Please add again.', 'error')
+        return redirect(url_for('views.add_child'))
+
+    # Build schedule and overlay guest completion state
+    entries = build_schedule_for_child(dob, child=None)
+    completed_map = session.get('guest_child_completed', {}) or {}
+    today = date.today()
+    due_soon_window = today + timedelta(days=30)
+    completed_count = overdue = due_soon = 0
+    total_vaccines = 0
+    for e in entries:
+        total_vaccines += len(e['vaccines'])
+        comp_date_str = completed_map.get(e['age'])
+        if comp_date_str:
+            try:
+                comp_date = datetime.strptime(comp_date_str, '%Y-%m-%d').date()
+            except Exception:
+                comp_date = today
+            e['group_completed'] = True
+            e['group_completed_date'] = comp_date
+            e['status_class'] = 'status-completed'
+            e['status_text'] = 'Completed'
+            completed_count += len(e['vaccines'])
+        else:
+            # pending vaccines in this group
+            if e['due_date'] <= today:
+                overdue += len(e['vaccines'])
+            elif today < e['due_date'] <= due_soon_window:
+                due_soon += len(e['vaccines'])
+
+    stats = {
+        'completed': completed_count,
+        'overdue': overdue,
+        'due_soon': due_soon,
+        'total': total_vaccines,
+    }
+
+    class _GuestChild:
+        def __init__(self, name, dob):
+            self.name = name
+            self.dob = dob
+            self.id = None
+
+    today_str = today.strftime('%Y-%m-%d')
+    return render_template('child_view.html', child=_GuestChild(name, dob), schedule_entries=entries, today_str=today_str, stats=stats, guest_mode=True)
+
+
+@views.route('/guest-child/complete', methods=['POST'])
+def guest_mark_vaccination_complete():
+    guest = session.get('guest_child')
+    if not guest:
+        return redirect(url_for('views.add_child'))
+    age = request.form.get('age')
+    date_str = request.form.get('date')
+    if not age or not date_str:
+        return redirect(url_for('views.guest_child_view'))
+    # Persist completion by age label
+    completed_map = session.get('guest_child_completed', {}) or {}
+    completed_map[age] = date_str
+    session['guest_child_completed'] = completed_map
+    return redirect(url_for('views.guest_child_view'))
+
+
+@views.route('/guest-child/update', methods=['POST'])
+def guest_update_child():
+    guest = session.get('guest_child')
+    if not guest:
+        return redirect(url_for('views.add_child'))
+    name = request.form.get('child_name', '').strip()
+    dob_str = request.form.get('dob', '').strip()
+    errors = _validate_child_form(name, dob_str)
+    if errors:
+        # Render view with errors and keep previous saved guest data
+        prev_name = guest.get('name') or ''
+        prev_dob_str = guest.get('dob') or ''
+        try:
+            dob = datetime.strptime(prev_dob_str, '%Y-%m-%d').date()
+        except Exception:
+            dob = date.today()
+        entries = build_schedule_for_child(dob, child=None)
+        # Overlay completion
+        completed_map = session.get('guest_child_completed', {}) or {}
+        for e in entries:
+            if completed_map.get(e['age']):
+                e['group_completed'] = True
+                try:
+                    e['group_completed_date'] = datetime.strptime(completed_map[e['age']], '%Y-%m-%d').date()
+                except Exception:
+                    e['group_completed_date'] = date.today()
+                e['status_class'] = 'status-completed'
+                e['status_text'] = 'Completed'
+        class _GuestChild:
+            def __init__(self, name, dob):
+                self.name = name
+                self.dob = dob
+                self.id = None
+        today_str = date.today().strftime('%Y-%m-%d')
+        return render_template('child_view.html', child=_GuestChild(prev_name, dob), schedule_entries=entries, today_str=today_str, stats=None, form_errors=errors, form_data={'child_name': name, 'dob': dob_str}, guest_mode=True, editing=True)
+    # No errors: update session and redirect
+    session['guest_child'] = {'name': name, 'dob': dob_str}
+    return redirect(url_for('views.guest_child_view'))
 
 @views.route('/dashboard')
 def dashboard():
     parent_id = session.get('parent_id')
     if not parent_id:
-        flash('Please log in first.', 'error')
-        return redirect(url_for('auth.login'))
+        # Guest: show a lightweight preview if they added one child
+        guest = session.get('guest_child')
+        if not guest:
+            flash('Log in to view your dashboard, or add a temporary child first.', 'info')
+            return redirect(url_for('views.add_child'))
+        # Build a preview schedule for the guest child
+        try:
+            dob_date = datetime.strptime(guest.get('dob', ''), '%Y-%m-%d').date()
+            schedule_entries = build_schedule_for_child(dob_date, child=None)
+        except Exception:
+            schedule_entries = []
+        # Render a minimal dashboard using base template
+        return render_template('dashboard.html', children=[], child_stats=[], overall_completed=0, overall_overdue=0, overall_upcoming=0, guest_child=guest, guest_schedule=schedule_entries)
     children = Child.query.filter_by(parent_id=parent_id).order_by(Child.created_at.desc()).all()
     today = date.today()
     due_soon_window = today + timedelta(days=30)

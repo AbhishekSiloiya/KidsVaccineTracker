@@ -16,6 +16,7 @@
             <!-- </div> -->
         </div>
         <div class="flex flex-col gap-2 w-full">
+            {% if not guest_mode %}
             <a
                 href="{{ url_for('views.download_child_calendar', child_id=child.id) }}"
                 id="downloadCalendarBtn"
@@ -25,6 +26,7 @@
                 <span class="material-symbols-outlined">calendar_apps_script</span>
                 Download Calendar
             </a>
+            {% endif %}
             <div class="flex flex-wrap items-center justify-between gap-3 mt-1 vt-totalstats">
                 <div class="flex flex-wrap gap-2">
                     {% if stats and stats.total is defined %}
@@ -55,7 +57,7 @@
         <div id="editFormContainer" class="hidden mt-4 vt-edit-child-form">
             <form
                 method="POST"
-                action="{{ url_for('views.update_child', child_id=child.id) }}"
+                action="{% if guest_mode %}{{ url_for('views.guest_update_child') }}{% else %}{{ url_for('views.update_child', child_id=child.id) }}{% endif %}"
                 class="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200"
             >
                 <h3 class="text-lg font-semibold text-gray-800">Edit Child Details</h3>
@@ -154,7 +156,7 @@
             {% else %}
             <form
                 method="POST"
-                action="{{ url_for('views.mark_vaccination_complete', child_id=child.id) }}"
+                action="{% if guest_mode %}{{ url_for('views.guest_mark_vaccination_complete') }}{% else %}{{ url_for('views.mark_vaccination_complete', child_id=child.id) }}{% endif %}"
                 class="flex flex-row gap-3 items-center"
             >
                 <div>
@@ -169,10 +171,14 @@
                 </div>
                 <div class="flex-1">
                     <!-- <label class="block text-xs font-medium text-gray-600 mb-1">Confirm all vaccines complete</label> -->
+                    {% if guest_mode %}
+                    <input type="hidden" name="age" value="{{ entry.age }}" />
+                    {% else %}
                     <select name="vaccine" class="hidden">
                         <!-- send first vaccine name just to satisfy form expects a vaccine value -->
                         <option value="{{ entry.vaccines[0] }}" selected>{{ entry.vaccines[0] }}</option>
                     </select>
+                    {% endif %}
                     <button
                         type="submit"
                         class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700"

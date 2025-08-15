@@ -3,7 +3,8 @@ from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from . import db
-from .models import Parent
+from .models import Parent, Child
+from .schedule_data import build_schedule_for_child
 
 auth = Blueprint('auth', __name__, template_folder='template')
 
@@ -14,6 +15,28 @@ def _current_parent():
 		return None
 	# SQLAlchemy 2.x: use Session.get instead of deprecated Query.get
 	return db.session.get(Parent, pid)
+
+
+def _consume_guest_child(parent_id: int):
+	"""If a guest child exists in session, move it into the database for this parent."""
+	data = session.pop('guest_child', None)
+	if not data:
+		return
+	name = (data.get('name') or '').strip()
+	dob_str = (data.get('dob') or '').strip()
+	if not name or not dob_str:
+		return
+	try:
+		from datetime import datetime as _dt
+		dob = _dt.strptime(dob_str, '%Y-%m-%d').date()
+	except Exception:
+		return
+	child = Child(name=name, dob=dob, parent_id=parent_id)
+	db.session.add(child)
+	db.session.commit()
+	# Create vaccinations for the child
+	build_schedule_for_child(child.dob, child=child)
+	db.session.commit()
 
 
 def login_required(f):
@@ -57,6 +80,7 @@ def register():
 			db.session.add(parent)
 			db.session.commit()
 			session['parent_id'] = parent.id
+			_consume_guest_child(parent.id)
 			return redirect(url_for('views.dashboard'))
 		return render_template('parent_register.html', errors=errors, form={'name': name, 'email': email, 'age': age})
 	return render_template('parent_register.html')
@@ -70,6 +94,7 @@ def login():
 		parent = Parent.query.filter_by(email=email).first()
 		if parent and check_password_hash(parent.password_hash, password):
 			session['parent_id'] = parent.id
+			_consume_guest_child(parent.id)
 			return redirect(url_for('views.dashboard'))
 		flash('Invalid credentials', 'error')
 	return render_template('parent_login.html')
