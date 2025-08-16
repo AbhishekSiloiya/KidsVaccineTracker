@@ -5,6 +5,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}VaccinationTracker - Child Vaccination Schedule{% endblock %}</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    screens: {
+                        // Custom breakpoints to match your original CSS
+                        xs: "480px",
+                        sm: "560px", // Your updated small breakpoint
+                        md: "770px", // Your original medium breakpoint
+                        lg: "1025px", // Your original large breakpoint
+                        xl: "1280px",
+                        "2xl": "1536px",
+
+                        // Max-width variants (for mobile-first approach)
+                        "max-xs": { max: "479px" },
+                        "max-sm": { max: "559px" }, // Less than 560px (your updated)
+                        "max-md": { max: "769px" }, // Less than 770px (your original)
+                        "max-lg": { max: "1024px" },
+                        "max-xl": { max: "1279px" },
+                    },
+                },
+            };
+        </script>
         <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -18,73 +40,135 @@
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
         {% block extra_head %}{% endblock %}
     </head>
-    <body class="gradient-bg min-h-screen py-8 vt-body layout-fab">
-        <div class="mx-auto px-[1.5rem] vt-layout">
+    <body
+        class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen py-8 font-['Inter',sans-serif] max-sm:py-2"
+    >
+        <div class="mx-auto px-6">
             <!-- Floating Action Button + Menu -->
-            <div id="fabContainer" class="vt-fab">
+            <div
+                id="fabContainer"
+                class="fixed right-4 bottom-4 z-50 flex flex-col items-end max-md:right-3 max-md:bottom-3 max-sm:right-2 max-sm:bottom-2"
+            >
                 <!-- Popup action list (reuses id=topActions for continuity) -->
-                <div id="topActions" class="fab-menu hidden" role="menu" aria-label="Quick actions">
-                    <div class="fab-menu-group">
-                        <a href="{{ url_for('views.dashboard') }}" class="fab-item" role="menuitem">
-                            <span class="material-symbols-outlined"> dashboard </span>
-                            <span class="label">Dashboard</span>
+                <div
+                    id="topActions"
+                    class="hidden flex-col items-stretch gap-2 mb-2 max-md:gap-1 max-sm:gap-1"
+                    role="menu"
+                    aria-label="Quick actions"
+                >
+                    <div class="flex flex-col gap-2 max-md:gap-1 max-sm:gap-1">
+                        <a
+                            href="{{ url_for('views.dashboard') }}"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
+                            role="menuitem"
+                        >
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                dashboard
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Dashboard</span>
                         </a>
-                        <a href="{{ url_for('views.add_child') }}" class="fab-item" role="menuitem">
-                            <span class="material-symbols-outlined"> person_add </span>
-                            <span class="label">Add Child</span>
+                        <a
+                            href="{{ url_for('views.add_child') }}"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
+                            role="menuitem"
+                        >
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                person_add
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Add Child</span>
                         </a>
                     </div>
 
                     {% if current_parent %}
-                    <div class="fab-menu-group">
+                    <div class="flex flex-col gap-2 max-md:gap-1 max-sm:gap-1">
                         <a
                             href="{{ url_for('auth.parent_profile', parent_id=current_parent.id) }}"
-                            class="fab-item"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span class="material-symbols-outlined"> account_circle </span>
-                            <span class="label">Profile</span>
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                account_circle
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Profile</span>
                         </a>
-                        <a href="{{ url_for('auth.logout') }}" class="fab-item" role="menuitem">
-                            <span class="material-symbols-outlined"> logout </span>
-                            <span class="label">Logout</span>
+                        <a
+                            href="{{ url_for('auth.logout') }}"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
+                            role="menuitem"
+                        >
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                logout
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Logout</span>
                         </a>
                     </div>
                     {% else %}
-                    <div class="fab-menu-group">
-                        <a href="{{ url_for('auth.login') }}" class="fab-item" role="menuitem">
-                            <span class="material-symbols-outlined"> login </span>
-                            <span class="label">Login</span>
+                    <div class="flex flex-col gap-2 max-md:gap-1 max-sm:gap-1">
+                        <a
+                            href="{{ url_for('auth.login') }}"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
+                            role="menuitem"
+                        >
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                login
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Login</span>
                         </a>
-                        <a href="{{ url_for('auth.register') }}" class="fab-item" role="menuitem">
-                            <span class="material-symbols-outlined"> how_to_reg </span>
-                            <span class="label">Register</span>
+                        <a
+                            href="{{ url_for('auth.register') }}"
+                            class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[180px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:min-w-[140px] max-md:px-2 max-md:py-2 max-sm:min-w-12 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
+                            role="menuitem"
+                        >
+                            <span
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                            >
+                                how_to_reg
+                            </span>
+                            <span class="font-semibold max-sm:hidden">Register</span>
                         </a>
                     </div>
                     {% endif %}
                 </div>
                 <button
                     id="fabToggle"
-                    class="fab-btn bg-gray-50 hover:bg-gray-200"
+                    class="w-14 h-14 rounded-2xl bg-gray-50 hover:bg-gray-200 inline-flex items-center justify-center border-0 shadow-lg transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-xl max-md:w-12 max-md:h-12 max-sm:w-11 max-sm:h-11"
                     aria-haspopup="true"
                     aria-expanded="false"
                     aria-controls="topActions"
                     title="Quick actions"
                 >
-                    <span id="fabIcon" class="material-symbols-outlined"> add </span>
+                    <span id="fabIcon" class="material-symbols-outlined text-3xl max-md:text-2xl max-sm:text-2xl">
+                        add
+                    </span>
                 </button>
             </div>
 
             <!-- Header -->
-            <header class="text-center mb-8 vt-header">
-                <h1 class="text-5xl font-bold text-gray-800 mb-4 vt-page-title">Child Vaccination Tracker</h1>
-                <div class="flex justify-between items-center max-w-[720px] mx-auto vt-container-narrow">
+            <header class="text-center mb-8 max-md:mb-3">
+                <h1
+                    class="text-5xl font-bold text-gray-800 mb-4 max-md:text-4xl max-md:leading-tight max-md:mb-1 max-sm:text-3xl max-sm:mb-3 max-sm:leading-tight"
+                >
+                    Child Vaccination Tracker
+                </h1>
+                <div class="flex justify-between items-center max-w-[720px] mx-auto max-sm:flex-col max-sm:gap-0">
                     <a
                         href="https://iapindia.org/pdf/Indian-Pediatrics/2024/Indian-Pediatrics-February-2024-issue.pdf"
-                        class="text-gray-600 text-lg hover:underline vt-subtitle"
+                        class="text-gray-600 text-lg hover:underline max-sm:text-sm max-sm:leading-5 max-sm:px-1"
                         >Based on IAP 2024 Schedule</a
                     >
-                    <p class="text-lg font-medium text-gray-700 m-0 p-0 vt-subtitle">
+                    <p
+                        class="text-lg font-medium text-gray-700 m-0 p-0 max-sm:text-sm max-sm:leading-5 max-sm:mt-0 max-sm:px-1"
+                    >
                         Country: <span class="font-semibold text-gray-800">India</span>
                     </p>
                 </div>
@@ -104,13 +188,24 @@
 
                 const openMenu = () => {
                     menu.classList.remove("hidden");
-                    menu.classList.add("open");
+                    // Apply staggered animation by adding open class and individual item delays
+                    menu.classList.add("animate-in", "fade-in", "slide-in-from-bottom-2", "duration-300");
+                    const items = menu.querySelectorAll("a");
+                    items.forEach((item, index) => {
+                        item.style.animationDelay = `${index * 40}ms`;
+                        item.classList.add("animate-in", "fade-in", "slide-in-from-bottom-1", "duration-200");
+                    });
                     toggle.setAttribute("aria-expanded", "true");
                     if (icon) icon.textContent = "close";
                 };
                 const closeMenu = () => {
                     menu.classList.add("hidden");
-                    menu.classList.remove("open");
+                    menu.classList.remove("animate-in", "fade-in", "slide-in-from-bottom-2");
+                    const items = menu.querySelectorAll("a");
+                    items.forEach((item) => {
+                        item.style.animationDelay = "";
+                        item.classList.remove("animate-in", "fade-in", "slide-in-from-bottom-1");
+                    });
                     toggle.setAttribute("aria-expanded", "false");
                     if (icon) icon.textContent = "add";
                 };

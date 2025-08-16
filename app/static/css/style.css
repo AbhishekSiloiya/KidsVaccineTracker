@@ -1,200 +1,4 @@
-/* Core custom styles for VaccinationTracker */
-body {
-    font-family: "Inter", sans-serif;
-}
-
-.gradient-bg {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-}
-
-/* Layout wrappers */
-.vt-top-actions {
-    margin-top: 1rem;
-}
-.vt-top-actions-left,
-.vt-top-actions-right {
-    display: flex;
-}
-.vt-nav-btn {
-    transition: background-color 0.2s ease, transform 0.18s ease;
-}
-.vt-nav-btn:hover {
-    transform: translateY(-2px);
-}
-
-/* Combined card for welcome and input */
-.combined-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto 1.5rem;
-    transition: box-shadow 0.3s;
-    position: relative;
-}
-
-.combined-card:hover {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Schedule cards styling */
-.schedule-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s;
-    padding: 0.75rem 1.25rem;
-    max-width: 800px;
-    margin: 0 auto 1rem;
-}
-
-.schedule-card:hover {
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Status badges */
-.status-due,
-.status-upcoming,
-.status-completed {
-    display: inline-block;
-    padding: 0.25rem 0.75rem; /* py-1 px-3 equivalent */
-    font-size: 0.875rem; /* text-sm */
-    font-weight: 500; /* font-medium */
-    color: #dc2626; /* Tailwind red-600 */
-    background-color: #fef2f2; /* Tailwind red-50 */
-    border: 1px solid #fecaca; /* Tailwind red-200 */
-    border-radius: 9999px; /* rounded-full */
-}
-
-.status-due {
-    color: #dc2626; /* Tailwind red-600 */
-    background-color: #fef2f2; /* Tailwind red-50 */
-    border: 1px solid #fecaca; /* Tailwind red-200 */
-}
-
-.status-upcoming {
-    color: #a16207; /* Tailwind yellow-600 */
-    background-color: #fef9c3; /* Tailwind yellow-50 */
-    border: 1px solid #fef08a; /* Tailwind yellow-200 */
-}
-
-.status-completed {
-    color: #15803d; /* Tailwind green-600 */
-    background-color: #dcfce7; /* Tailwind green-50 */
-    border: 1px solid #bbf7d0; /* Tailwind green-200 */
-}
-
-/* Dashboard styling */
-.dashboard {
-    margin-top: 1rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-.stat-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-}
-
-.stat-title {
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-
-.stat-value {
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #111827;
-}
-
-.profile-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.pill {
-    display: inline-block;
-    padding: 0.15rem 0.5rem;
-    border-radius: 9999px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-.pill-red {
-    background: #fee2e2;
-    color: #b91c1c;
-}
-.pill-yellow {
-    background: #fef9c3;
-    color: #a16207;
-}
-.pill-green {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-/* Expandable card details */
-.card-details {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in-out;
-}
-
-.schedule-card.expanded .card-details {
-    max-height: 400px;
-    padding-top: 0.75rem;
-}
-
-.expand-icon {
-    cursor: pointer;
-    transition: transform 0.3s;
-}
-
-.schedule-card.expanded .expand-icon {
-    transform: rotate(180deg);
-}
-
-/* Error styling */
-.error-text {
-    color: #dc2626;
-    font-size: 0.875rem;
-}
-
-/* Animation classes */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Custom scrollbar */
+/* Custom scrollbar styles (can't be replaced with Tailwind) */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -212,101 +16,17 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
-/* (Intentionally slimmed; detailed mobile tweaks consolidated in responsive.css) */
 
-/* Floating Action Button (FAB) */
-.vt-fab {
-    position: fixed;
-    right: 1rem;
-    bottom: 1rem;
-    z-index: 50;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.fab-btn {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: 1rem;
-    /* background: #3b82f6;
-    color: #fff; */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 0;
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
-}
-.fab-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 14px 18px rgba(0, 0, 0, 0.18);
-    /* background: #2563eb; */
-}
-.fab-btn .material-symbols-outlined {
-    font-size: 28px;
-}
-
-.fab-menu {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-.fab-menu.hidden {
-    display: none;
-}
-
-.fab-menu-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.fab-item {
-    font-size: 1.2rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    background: #ffffff;
-    color: #1f2937;
-    border: 1px solid #e5e7eb;
-    padding: 0.6rem 0.8rem;
-    border-radius: 12px;
-    text-decoration: none;
-    min-width: 180px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-    transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    backdrop-filter: blur(8px);
-}
-.fab-item:hover {
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
-    background: oklch(96.7% 0.003 264.542);
-}
-.fab-item .material-symbols-outlined {
-    font-size: 1.5rem;
-    color: oklch(51.1% 0.262 276.966);
-}
-.fab-item .label {
-    font-weight: 600;
-}
-
-/* Subtle appear animation */
-.fab-menu.open .fab-item {
-    animation: vtFadeUp 160ms ease-out both;
-}
-.fab-menu.open .fab-item:nth-child(1) {
-    animation-delay: 0ms;
-}
-.fab-menu.open .fab-item:nth-child(2) {
-    animation-delay: 40ms;
-}
-.fab-menu.open .fab-item:nth-child(3) {
-    animation-delay: 80ms;
-}
-.fab-menu.open .fab-item:nth-child(4) {
-    animation-delay: 120ms;
+/* Animation keyframes (complex animations that Tailwind can't handle easily) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes vtFadeUp {
@@ -318,4 +38,9 @@ body {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Helper class for fade-in animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
 }

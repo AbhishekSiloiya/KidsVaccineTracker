@@ -1,15 +1,14 @@
 {% extends 'base.html' %} {% block title %}Add Child - VaccinationTracker{% endblock %} {% block content %}
 <!-- Add Child Form Only -->
-<div id="inputCard" class="combined-card mb-6 vt-add-child-card">
+<div id="inputCard" class="bg-white rounded-xl shadow-sm transition-shadow duration-300 hover:shadow-lg p-8 max-w-[800px] mx-auto mb-6 relative max-md:p-3 max-md:mx-1 max-md:mb-3 max-md:rounded-lg max-md:shadow-none max-md:border max-md:border-gray-200 max-sm:p-3 max-sm:mx-0.5 max-sm:mb-2 lg:p-10">
     <form
         id="addChildForm"
         method="POST"
         action="{{ url_for('views.add_child') }}"
         novalidate
-        class="vt-add-child-form"
     >
-        <h2 class="text-2xl font-bold text-gray-800 mb-1">Add a Child</h2>
-        <p class="text-gray-600 my-4">Enter your child's details to generate a personalized vaccination schedule.</p>
+        <h2 class="text-2xl font-bold text-gray-800 mb-1 max-md:mb-0.5 max-sm:mb-5">Add a Child</h2>
+        <p class="text-gray-600 my-4 max-md:mb-2">Enter your child's details to generate a personalized vaccination schedule.</p>
 
         {% if form_errors %}
         <div class="mb-4 p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
@@ -25,9 +24,9 @@
         </div>
         {% endif %}
 
-    <div class="flex flex-col sm:flex-row items-end gap-4 mt-8 vt-form-row">
+    <div class="flex flex-col sm:flex-row items-end gap-4 mt-8 max-md:gap-3">
             <div class="flex-[2] w-full">
-                <label for="nameInput" class="text-lg font-medium text-gray-700">Child's Name</label>
+                <label for="nameInput" class="text-lg font-medium text-gray-700 max-md:font-semibold max-md:mb-1">Child's Name</label>
                 <input
                     id="nameInput"
                     name="child_name"
@@ -35,26 +34,26 @@
                     placeholder="Enter name"
                     value="{{ form_data.child_name if form_data else '' }}"
                     required
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none vt-input-text"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none max-md:min-h-10 max-md:p-2"
                 />
             </div>
             <div class="flex-1 w-full">
-                <label for="dobInput" class="text-lg font-medium text-gray-700">Date of Birth</label>
+                <label for="dobInput" class="text-lg font-medium text-gray-700 max-md:font-semibold max-md:mb-1">Date of Birth</label>
                 <input
                     id="dobInput"
                     name="dob"
                     type="date"
                     value="{{ form_data.dob if form_data else '' }}"
                     required
-                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none vt-input-date"
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none max-md:min-h-10 max-md:p-2"
                 />
             </div>
             <div class="flex-1 w-full">
-                <label for="countryInput" class="text-lg font-medium text-gray-700">Country</label>
+                <label for="countryInput" class="text-lg font-medium text-gray-700 max-md:font-semibold max-md:mb-1">Country</label>
                 <select
                     id="countryInput"
                     name="country"
-                    class="text-lg mt-1 block w-full px-2 py-[0.6rem] border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none vt-input-select"
+                    class="text-lg mt-1 block w-full px-2 py-[0.6rem] border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none max-md:min-h-10 max-md:p-3"
                     required
                 >
                     {% set selected_country = (form_data.country if form_data and form_data.country else 'India') %}
@@ -64,7 +63,7 @@
                 </select>
             </div>
         </div>
-        <div class="flex flex-1 flex-col gap-2 flex-row mt-4 w-full whitespace-nowrap">
+        <div class="flex flex-1 gap-2 flex-row mt-4 w-full whitespace-nowrap">
             <button
                 id="cancelEditBtn"
                 type="button"
@@ -75,12 +74,12 @@
             <button
                 id="generateBtn"
                 type="submit"
-                class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md"
+                class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md max-md:min-h-9 max-md:py-2 max-md:px-3 max-md:rounded-md max-md:font-semibold max-sm:w-full"
             >
                 Generate Schedule
             </button>
         </div>
-        <p id="errorMsg" class="error-text hidden text-sm mt-2">Please enter name and valid date.</p>
+        <p id="errorMsg" class="text-red-600 hidden text-sm mt-2 max-md:mt-1">Please enter name and valid date.</p>
     </form>
 </div>
 {% endblock %}
