@@ -43,6 +43,22 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        # Lightweight migration for existing SQLite DBs: add 'country' column to children if missing
+        try:
+            from sqlalchemy import text
+            engine = db.engine
+            with engine.connect() as conn:
+                res = conn.execute(text("PRAGMA table_info(children)"))
+                cols = {row[1] for row in res}  # row[1] is column name
+                if 'country' not in cols:
+                    # Add nullable column with default 'India'
+                    conn.execute(text("ALTER TABLE children ADD COLUMN country VARCHAR(50)"))
+                    # Initialize nulls to 'India'
+                    conn.execute(text("UPDATE children SET country = 'India' WHERE country IS NULL"))
+                    conn.commit()
+        except Exception:
+            # Best-effort; ignore if database isn't SQLite or migration not applicable
+            pass
 
     from .views import views
     from .auth import auth

@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from . import db
 from .models import Parent, Child
-from .schedule_data import build_schedule_for_child
+from .schedule_data import build_schedule_for_child, get_reference_url
 
 auth = Blueprint('auth', __name__, template_folder='template')
 
@@ -31,11 +31,13 @@ def _consume_guest_child(parent_id: int):
 		dob = _dt.strptime(dob_str, '%Y-%m-%d').date()
 	except Exception:
 		return
-	child = Child(name=name, dob=dob, parent_id=parent_id)
+	# Pull country if present in session data
+	country = (data.get('country') or 'India') if isinstance(data, dict) else 'India'
+	child = Child(name=name, dob=dob, parent_id=parent_id, country=country)
 	db.session.add(child)
 	db.session.commit()
 	# Create vaccinations for the child
-	build_schedule_for_child(child.dob, child=child)
+	build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
 	db.session.commit()
 
 
@@ -138,7 +140,9 @@ def parent_profile(parent_id):
 
 @auth.app_context_processor
 def inject_parent():
-	return {'current_parent': _current_parent()}
+	# Also provide default schedule info for base header when in auth pages
+	default_country = 'India'
+	return {'current_parent': _current_parent(), 'reference_url': get_reference_url(default_country), 'reference_label': 'Official schedule', 'current_country': default_country}
 
 
 @auth.route('/parent/<int:parent_id>/delete', methods=['POST'])

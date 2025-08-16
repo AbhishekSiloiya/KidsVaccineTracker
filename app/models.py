@@ -23,6 +23,9 @@ class Child(db.Model):
     parent_id = db.Column(db.Integer, db.ForeignKey('parents.id', ondelete='CASCADE'), nullable=False, index=True)
     name = db.Column(db.String(100), nullable=False)
     dob = db.Column(db.Date, nullable=False)
+    # Country for schedule selection (e.g., 'India', 'UK').
+    # Keep nullable=True for backward compatibility with existing DBs created before this column existed.
+    country = db.Column(db.String(50), nullable=True, default='India')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationship to Vaccination records

@@ -1,0 +1,38 @@
+{
+  "India": {
+    "reference_url": "https://iapindia.org/pdf/Indian-Pediatrics/2024/Indian-Pediatrics-February-2024-issue.pdf",
+    "schedule": [
+      {"age": "Birth", "vaccines": ["BCG", "OPV 0", "Hepatitis B-1"]},
+      {"age": "6 Weeks", "vaccines": ["DTwP/DTaP-1", "IPV-1", "Hib-1", "Rotavirus-1", "PCV-1", "Hepatitis B-2"]},
+      {"age": "10 Weeks", "vaccines": ["DTwP/DTaP-2", "IPV-2", "Hib-2", "Rotavirus-2", "PCV-2", "Hepatitis B-3"]},
+      {"age": "14 Weeks", "vaccines": ["DTwP/DTaP-3", "IPV-3", "Hib-3", "Rotavirus-3", "PCV-3", "Hepatitis B-4"]},
+      {"age": "6 Months", "vaccines": ["Influenza (IIV)-1"]},
+      {"age": "7 Months", "vaccines": ["Influenza (IIV)-2"]},
+      {"age": "6-9 Months", "vaccines": ["Typhoid Conjugate Vaccine"]},
+      {"age": "9 Months", "vaccines": ["MMR-1", "Meningococcal-1"]},
+      {"age": "12 Months", "vaccines": ["Hepatitis A", "Meningococcal-2", "Japanese Encephalitis-1", "Cholera-1"]},
+      {"age": "13 Months", "vaccines": ["Japanese Encephalitis-2", "Cholera-2"]},
+      {"age": "15 Months", "vaccines": ["MMR-2", "Varicella-1", "PCV Booster"]},
+      {"age": "16-18 Months", "vaccines": ["DTwP/DTaP-B1", "Hib-B1", "IPV-B1"]},
+      {"age": "18-19 Months", "vaccines": ["Hepatitis A-2", "Varicella-2"]},
+      {"age": "4-6 Years", "vaccines": ["DTwP/DTaP-B2", "IPV-B2", "MMR-3"]},
+      {"age": "10 Years", "vaccines": ["Tdap"]},
+      {"age": "15-18 Years", "vaccines": ["HPV"]},
+      {"age": "16-18 Years", "vaccines": ["Td"]}
+    ]
+  },
+  "UK": {
+    "reference_url": "https://www.nhs.uk/conditions/vaccinations/nhs-vaccinations-and-when-to-have-them/",
+    "schedule": [
+      {"age": "8 Weeks", "vaccines": ["6-in-1 (DTaP/IPV/Hib/HepB)-1", "Rotavirus-1", "MenB-1", "PCV-1"]},
+      {"age": "12 Weeks", "vaccines": ["6-in-1 (DTaP/IPV/Hib/HepB)-2", "Rotavirus-2"]},
+      {"age": "16 Weeks", "vaccines": ["6-in-1 (DTaP/IPV/Hib/HepB)-3", "MenB-2", "PCV-2"]},
+      {"age": "1 Year", "vaccines": ["Hib/MenC booster", "MMR-1", "PCV booster", "MenB booster"]},
+      {"age": "2-3 Years", "vaccines": ["Flu (annually)"]},
+      {"age": "3 Years 4 Months", "vaccines": ["MMR-2", "4-in-1 (DTaP/IPV) pre-school booster"]},
+      {"age": "12-13 Years", "vaccines": ["HPV (2 doses)"]},
+      {"age": "14 Years", "vaccines": ["3-in-1 (Td/IPV) booster", "MenACWY"]},
+      {"age": "Every Year", "vaccines": ["Flu (certain groups)"]}
+    ]
+  }
+}

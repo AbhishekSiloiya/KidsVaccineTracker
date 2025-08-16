@@ -1,6 +1,6 @@
 from app.models import Parent, Child, Vaccination
 from app.schedule_data import build_schedule_for_child
-from datetime import date
+from datetime import date, timedelta
 import pytest
 
 
@@ -37,12 +37,28 @@ def test_schedule_creates_vaccinations(_db, cleanup):
     _db.session.add(p)
     _db.session.commit()
     cleanup.track(p)
-    c = Child(name='Kid', dob=date(2024,1,1), parent_id=p.id)
+    c = Child(name='Kid', dob=date(2024,1,1), parent_id=p.id, country='India')
     _db.session.add(c)
     _db.session.commit()
     build_schedule_for_child(c.dob, child=c)
     vacs = Vaccination.query.filter_by(child_id=c.id).all()
     assert len(vacs) > 0
+
+
+def test_schedule_uses_child_country(_db, cleanup):
+    p = Parent(name='C', email='country@example.com', password_hash='x')
+    _db.session.add(p)
+    _db.session.commit()
+    cleanup.track(p)
+    c = Child(name='UKKid', dob=date(2024,1,1), parent_id=p.id, country='UK')
+    _db.session.add(c)
+    _db.session.commit()
+    build_schedule_for_child(c.dob, child=c, country=c.country)
+    vacs = Vaccination.query.filter_by(child_id=c.id).all()
+    assert any(v.name for v in vacs)
+    # UK schedule should include an 8 Weeks group; confirm at least one vaccine due at that offset exists
+    eight_weeks_due = date(2024,1,1) + timedelta(weeks=8)
+    assert any(v.due_date == eight_weeks_due for v in vacs)
 
 
 def test_cascade_delete(_db):

@@ -27,6 +27,31 @@ def test_register_and_login(client, _db):
     assert dash.status_code == 200
 
 
+def test_guest_child_country_persists_on_register(client, _db):
+    # Add guest child with UK
+    client.post('/add-child', data={
+        'child_name': 'GuestKid',
+        'dob': '2024-01-01',
+        'country': 'UK'
+    }, follow_redirects=True)
+
+    # Register and ensure guest child is moved into DB with country
+    resp = client.post('/auth/register', data={
+        'name': 'GUser',
+        'email': 'guser@example.com',
+        'age': '28',
+        'password': 'secret123'
+    }, follow_redirects=True)
+    assert resp.status_code == 200
+
+    with current_app.app_context():
+        parent = Parent.query.filter_by(email='guser@example.com').first()
+        assert parent is not None
+        child = Child.query.filter_by(parent_id=parent.id).first()
+        assert child is not None
+        assert (child.country or 'India') == 'UK'
+
+
 def test_delete_account(client, _db):
     # Register a user who will be deleted
     email = 'deluser@example.com'

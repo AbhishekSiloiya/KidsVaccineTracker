@@ -2,11 +2,21 @@ from flask import Blueprint, render_template, request, redirect, url_for, Respon
 from datetime import date, datetime, timedelta, timezone
 from .models import Child, Vaccination, Parent
 from . import db
-from .schedule_data import build_schedule_for_child
+from .schedule_data import build_schedule_for_child, get_reference_url, get_countries
 
 # Specify the template_folder because the project currently uses 'template' (singular)
 # If you later rename the folder to 'templates', you can remove the parameter.
 views = Blueprint('views', __name__, template_folder='template')
+
+@views.app_context_processor
+def inject_reference_defaults():
+    default_country = 'India'
+    return {
+        'reference_url': get_reference_url(default_country),
+        'reference_label': 'Official schedule',
+    'current_country': default_country,
+    'available_countries': get_countries(),
+    }
 
 @views.app_template_filter('friendly_date')
 def friendly_date(value):
@@ -73,12 +83,14 @@ def age_text(value):
 @views.route('/')
 def home():
     # Render the base layout so linked CSS/JS are requested and applied
-    return render_template('base.html')
+    # Default to India when no specific child context
+    default_country = 'India'
+    return render_template('base.html', reference_url=get_reference_url(default_country), reference_label='Official schedule', current_country=default_country)
 
 def base_template():  # Optional helper
     return render_template('base.html')
 
-def _validate_child_form(name: str, dob_str: str):
+def _validate_child_form(name: str, dob_str: str, country: str | None = None):
     errors = []
     if not name or len(name.strip()) < 2:
         errors.append('Child name must be at least 2 characters.')
@@ -91,6 +103,8 @@ def _validate_child_form(name: str, dob_str: str):
                 errors.append('Date of birth cannot be in the future.')
         except ValueError:
             errors.append('Invalid date format.')
+    if country and country not in get_countries():
+        errors.append('Invalid country selection.')
     return errors
 
 @views.route('/add-child', methods=['GET', 'POST'])
@@ -102,12 +116,13 @@ def add_child():
     if request.method == 'POST':
         name = request.form.get('child_name', '').strip()
         dob = request.form.get('dob', '')
-        form_data = {'child_name': name, 'dob': dob}
-        form_errors = _validate_child_form(name, dob)
+        country = request.form.get('country', 'India')
+        form_data = {'child_name': name, 'dob': dob, 'country': country}
+        form_errors = _validate_child_form(name, dob, country)
         if not form_errors:
             if parent_id:
                 # Persist child in DB for logged-in parent
-                child = Child(name=name, dob=datetime.strptime(dob, '%Y-%m-%d').date(), parent_id=parent_id)
+                child = Child(name=name, dob=datetime.strptime(dob, '%Y-%m-%d').date(), parent_id=parent_id, country=country)
                 db.session.add(child)
                 db.session.commit()
                 form_success = 'Child added successfully.'
@@ -116,15 +131,17 @@ def add_child():
                 if session.get('guest_child'):
                     flash('Adding more than one child requires an account. Please register or log in.', 'error')
                     return redirect(url_for('auth.register'))
-                session['guest_child'] = {'name': name, 'dob': dob}
+                session['guest_child'] = {'name': name, 'dob': dob, 'country': country}
                 # Redirect to guest child view so they can manage schedule
                 return redirect(url_for('views.guest_child_view'))
     else:
         # GET: if guest child exists, prefill and show preview
         if not parent_id and session.get('guest_child'):
             gc = session['guest_child']
-            form_data = {'child_name': gc.get('name') or '', 'dob': gc.get('dob') or ''}
-    return render_template('add_child.html', form_errors=form_errors, form_success=form_success, form_data=form_data)
+            form_data = {'child_name': gc.get('name') or '', 'dob': gc.get('dob') or '', 'country': gc.get('country') or 'India'}
+    # Header context
+    current_country = form_data.get('country') if form_data else 'India'
+    return render_template('add_child.html', form_errors=form_errors, form_success=form_success, form_data=form_data, reference_url=get_reference_url(current_country), reference_label='Official schedule', current_country=current_country)
 
 
 @views.route('/guest-child')
@@ -142,7 +159,7 @@ def guest_child_view():
         return redirect(url_for('views.add_child'))
 
     # Build schedule and overlay guest completion state
-    entries = build_schedule_for_child(dob, child=None)
+    entries = build_schedule_for_child(dob, child=None, country=guest.get('country') or 'India')
     completed_map = session.get('guest_child_completed', {}) or {}
     today = date.today()
     due_soon_window = today + timedelta(days=30)
@@ -176,13 +193,15 @@ def guest_child_view():
     }
 
     class _GuestChild:
-        def __init__(self, name, dob):
+        def __init__(self, name, dob, country):
             self.name = name
             self.dob = dob
+            self.country = country
             self.id = None
 
     today_str = today.strftime('%Y-%m-%d')
-    return render_template('child_view.html', child=_GuestChild(name, dob), schedule_entries=entries, today_str=today_str, stats=stats, guest_mode=True)
+    country = guest.get('country') or 'India'
+    return render_template('child_view.html', child=_GuestChild(name, dob, country), schedule_entries=entries, today_str=today_str, stats=stats, guest_mode=True, reference_url=get_reference_url(country), reference_label='Official schedule', current_country=country)
 
 
 @views.route('/guest-child/complete', methods=['POST'])
@@ -208,7 +227,8 @@ def guest_update_child():
         return redirect(url_for('views.add_child'))
     name = request.form.get('child_name', '').strip()
     dob_str = request.form.get('dob', '').strip()
-    errors = _validate_child_form(name, dob_str)
+    country = request.form.get('country', 'India')
+    errors = _validate_child_form(name, dob_str, country)
     if errors:
         # Render view with errors and keep previous saved guest data
         prev_name = guest.get('name') or ''
@@ -217,7 +237,7 @@ def guest_update_child():
             dob = datetime.strptime(prev_dob_str, '%Y-%m-%d').date()
         except Exception:
             dob = date.today()
-        entries = build_schedule_for_child(dob, child=None)
+        entries = build_schedule_for_child(dob, child=None, country=guest.get('country') or 'India')
         # Overlay completion
         completed_map = session.get('guest_child_completed', {}) or {}
         for e in entries:
@@ -230,14 +250,16 @@ def guest_update_child():
                 e['status_class'] = 'status-completed'
                 e['status_text'] = 'Completed'
         class _GuestChild:
-            def __init__(self, name, dob):
+            def __init__(self, name, dob, country):
                 self.name = name
                 self.dob = dob
+                self.country = country
                 self.id = None
         today_str = date.today().strftime('%Y-%m-%d')
-        return render_template('child_view.html', child=_GuestChild(prev_name, dob), schedule_entries=entries, today_str=today_str, stats=None, form_errors=errors, form_data={'child_name': name, 'dob': dob_str}, guest_mode=True, editing=True)
+        cur_country = guest.get('country') or 'India'
+        return render_template('child_view.html', child=_GuestChild(prev_name, dob, cur_country), schedule_entries=entries, today_str=today_str, stats=None, form_errors=errors, form_data={'child_name': name, 'dob': dob_str, 'country': country}, guest_mode=True, editing=True, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
     # No errors: update session and redirect
-    session['guest_child'] = {'name': name, 'dob': dob_str}
+    session['guest_child'] = {'name': name, 'dob': dob_str, 'country': country}
     return redirect(url_for('views.guest_child_view'))
 
 @views.route('/dashboard')
@@ -252,11 +274,12 @@ def dashboard():
         # Build a preview schedule for the guest child
         try:
             dob_date = datetime.strptime(guest.get('dob', ''), '%Y-%m-%d').date()
-            schedule_entries = build_schedule_for_child(dob_date, child=None)
+            schedule_entries = build_schedule_for_child(dob_date, child=None, country=guest.get('country') or 'India')
         except Exception:
             schedule_entries = []
         # Render a minimal dashboard using base template
-        return render_template('dashboard.html', children=[], child_stats=[], overall_completed=0, overall_overdue=0, overall_upcoming=0, guest_child=guest, guest_schedule=schedule_entries)
+        cur_country = guest.get('country') or 'India'
+        return render_template('dashboard.html', children=[], child_stats=[], overall_completed=0, overall_overdue=0, overall_upcoming=0, guest_child=guest, guest_schedule=schedule_entries, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
     children = Child.query.filter_by(parent_id=parent_id).order_by(Child.created_at.desc()).all()
     today = date.today()
     due_soon_window = today + timedelta(days=30)
@@ -315,7 +338,7 @@ def child_view(child_id):
     schedule_entries = []
     stats = {}
     if child:
-        schedule_entries = build_schedule_for_child(child.dob, child=child)
+        schedule_entries = build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
         vacs = Vaccination.query.filter_by(child_id=child.id).all()
         today = date.today()
         due_soon_window = today + timedelta(days=30)
@@ -326,7 +349,8 @@ def child_view(child_id):
             'total': len(vacs),
         }
     today_str = date.today().strftime('%Y-%m-%d')
-    return render_template('child_view.html', child=child, schedule_entries=schedule_entries, today_str=today_str, stats=stats)
+    cur_country = (child.country if child else 'India')
+    return render_template('child_view.html', child=child, schedule_entries=schedule_entries, today_str=today_str, stats=stats, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
 
 
 @views.route('/child/<int:child_id>/complete', methods=['POST'])
@@ -434,10 +458,11 @@ def update_child(child_id):
     child = Child.query.filter_by(id=child_id, parent_id=parent_id).first_or_404()
     name = request.form.get('child_name', '').strip()
     dob_str = request.form.get('dob', '').strip()
-    errors = _validate_child_form(name, dob_str)
+    country = request.form.get('country', 'India')
+    errors = _validate_child_form(name, dob_str, country)
     if errors:
         # Re-render child view with errors
-        schedule_entries = build_schedule_for_child(child.dob, child=child)
+        schedule_entries = build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
         vacs = Vaccination.query.filter_by(child_id=child.id).all()
         today = date.today()
         due_soon_window = today + timedelta(days=30)
@@ -448,16 +473,22 @@ def update_child(child_id):
             'total': len(vacs),
         }
         today_str = today.strftime('%Y-%m-%d')
-        return render_template('child_view.html', child=child, schedule_entries=schedule_entries, today_str=today_str, stats=stats, form_errors=errors, editing=True, form_data={'child_name': name, 'dob': dob_str})
+        cur_country = child.country or 'India'
+        return render_template('child_view.html', child=child, schedule_entries=schedule_entries, today_str=today_str, stats=stats, form_errors=errors, editing=True, form_data={'child_name': name, 'dob': dob_str, 'country': country}, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
 
     new_dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
     dob_changed = new_dob != child.dob
+    # If country changed, we'll need to rebuild schedule entries as due dates depend on DOB but set per schedule set
     child.name = name
     child.dob = new_dob
+    country_changed = False
+    if hasattr(child, 'country'):
+        country_changed = (child.country or 'India') != (country or 'India')
+        child.country = country or 'India'
     db.session.commit()
-    if dob_changed:
+    if dob_changed or country_changed:
         # Recreate vaccinations for new DOB: delete existing then rebuild
         Vaccination.query.filter_by(child_id=child.id).delete()
         db.session.commit()
-        build_schedule_for_child(child.dob, child=child)
+        build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
     return redirect(url_for('views.child_view', child_id=child.id))

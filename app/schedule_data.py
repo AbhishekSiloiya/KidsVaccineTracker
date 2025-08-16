@@ -1,64 +1,108 @@
 from datetime import date, timedelta
+import json
+import os
+import re
+from typing import List, Dict, Any, Optional, Tuple
 from . import db
 from .models import Vaccination
 
-vaccination_schedule = [
-    {"age": "Birth", "vaccines": ["BCG", "OPV 0", "Hepatitis B-1"]},
-    {"age": "6 Weeks", "vaccines": ["DTwP/DTaP-1", "IPV-1", "Hib-1", "Rotavirus-1", "PCV-1", "Hepatitis B-2"]},
-    {"age": "10 Weeks", "vaccines": ["DTwP/DTaP-2", "IPV-2", "Hib-2", "Rotavirus-2", "PCV-2", "Hepatitis B-3"]},
-    {"age": "14 Weeks", "vaccines": ["DTwP/DTaP-3", "IPV-3", "Hib-3", "Rotavirus-3", "PCV-3", "Hepatitis B-4"]},
-    {"age": "6 Months", "vaccines": ["Influenza (IIV)-1"]},
-    {"age": "7 Months", "vaccines": ["Influenza (IIV)-2"]},
-    {"age": "6-9 Months", "vaccines": ["Typhoid Conjugate Vaccine"]},
-    {"age": "9 Months", "vaccines": ["MMR-1", "Meningococcal-1"]},
-    {"age": "12 Months", "vaccines": ["Hepatitis A", "Meningococcal-2", "Japanese Encephalitis-1", "Cholera-1"]},
-    {"age": "13 Months", "vaccines": ["Japanese Encephalitis-2", "Cholera-2"]},
-    {"age": "15 Months", "vaccines": ["MMR-2", "Varicella-1", "PCV Booster"]},
-    {"age": "16-18 Months", "vaccines": ["DTwP/DTaP-B1", "Hib-B1", "IPV-B1"]},
-    {"age": "18-19 Months", "vaccines": ["Hepatitis A-2", "Varicella-2"]},
-    {"age": "4-6 Years", "vaccines": ["DTwP/DTaP-B2", "IPV-B2", "MMR-3"]},
-    {"age": "10 Years", "vaccines": ["Tdap"]},
-    {"age": "15-18 Years", "vaccines": ["HPV"]},
-    {"age": "16-18 Years", "vaccines": ["Td"]},
-]
+# Lazy-loaded cache
+_SCHEDULE_DATA: Optional[Dict[str, Any]] = None
+
+def _load_schedules() -> Dict[str, Any]:
+    global _SCHEDULE_DATA
+    if _SCHEDULE_DATA is not None:
+        return _SCHEDULE_DATA
+    # schedules.json is placed under app/static for easy serving
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(base_dir, 'static', 'schedules.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+            _SCHEDULE_DATA = json.load(f)
+    except Exception:
+        # Fallback: minimal India-only if file missing
+        _SCHEDULE_DATA = {
+            'India': {
+                'reference_url': 'https://iapindia.org/pdf/Indian-Pediatrics/2024/Indian-Pediatrics-February-2024-issue.pdf',
+                'schedule': [
+                    {"age": "Birth", "vaccines": ["BCG", "OPV 0", "Hepatitis B-1"]}
+                ]
+            }
+        }
+    return _SCHEDULE_DATA
+
+def get_countries() -> List[str]:
+    return list(_load_schedules().keys())
+
+def get_reference_url(country: str) -> Optional[str]:
+    data = _load_schedules()
+    c = data.get(country or '') or data.get('India')
+    if isinstance(c, dict):
+        return c.get('reference_url')
+    return None
+
+def get_schedule(country: str) -> Tuple[List[Dict[str, Any]], str]:
+    data = _load_schedules()
+    ckey = country if country in data else 'India'
+    cdata = data.get(ckey, {})
+    return cdata.get('schedule', []), cdata.get('reference_url', '')
 
 def _calc_due_date(dob: date, age_label: str) -> date:
-    parts = age_label.split()
-    if not parts:
+    label = (age_label or '').strip()
+    if not label:
         return dob
-    num_part = parts[0]
-    unit = (parts[1] if len(parts) > 1 else '').lower()
-    if '-' in num_part:
-        num_part = num_part.split('-')[0]
-    try:
-        n = int(num_part)
-    except ValueError:
-        n = 0
+    # Handle ranges by taking the first number (e.g., '16-18 Months' -> 16 Months)
+    label = re.sub(r"(\d+)\s*-\s*\d+", r"\1", label)
+    # Sum all occurrences like '3 Years', '4 Months', '6 Weeks'
+    year_sum = 0
+    month_sum = 0
+    week_sum = 0
+    for m in re.finditer(r"(\d+)\s*(year|years|month|months|week|weeks)", label, flags=re.IGNORECASE):
+        n = int(m.group(1))
+        unit = m.group(2).lower()
+        if unit.startswith('year'):
+            year_sum += n
+        elif unit.startswith('month'):
+            month_sum += n
+        elif unit.startswith('week'):
+            week_sum += n
+    # If nothing matched but label mentions 'year' (e.g., 'Every Year'), default to 1 year
+    if year_sum == 0 and month_sum == 0 and week_sum == 0:
+        if re.search(r"year", label, re.IGNORECASE):
+            year_sum = 1
+        elif re.search(r"month", label, re.IGNORECASE):
+            month_sum = 1
+        elif re.search(r"week", label, re.IGNORECASE):
+            week_sum = 1
+        else:
+            return dob
+    # Apply additions
     d = dob
-    if unit.startswith('week'):
-        return d + timedelta(weeks=n)
-    if unit.startswith('month'):
-        month = d.month - 1 + n
+    if year_sum:
+        try:
+            d = date(d.year + year_sum, d.month, d.day)
+        except ValueError:
+            d = date(d.year + year_sum, d.month, min(d.day, 28))
+    if month_sum:
+        month = d.month - 1 + month_sum
         year = d.year + month // 12
         month = month % 12 + 1
         day = min(d.day, [31,29 if year%4==0 and (year%100!=0 or year%400==0) else 28,31,30,31,30,31,31,30,31,30,31][month-1])
-        return date(year, month, day)
-    if 'year' in unit:
-        try:
-            return date(d.year + n, d.month, d.day)
-        except ValueError:
-            return date(d.year + n, d.month, min(d.day, 28))
+        d = date(year, month, day)
+    if week_sum:
+        d = d + timedelta(weeks=week_sum)
     return d
 
-def build_schedule_for_child(dob: date, child=None):
+def build_schedule_for_child(dob: date, child=None, country: Optional[str] = None):
     """Return schedule entries and ensure Vaccination rows exist.
 
     If a child model is provided, create Vaccination rows for each vaccine if missing.
     """
     today = date.today()
     entries = []
+    schedule, _ref = get_schedule(country or getattr(child, 'country', None) or 'India')
 
-    for item in vaccination_schedule:
+    for item in schedule:
         due = _calc_due_date(dob, item['age'])
         # For each vaccine in group ensure a Vaccination record exists
         vaccine_records = []

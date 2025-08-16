@@ -5,15 +5,20 @@
     <div class="flex flex-col gap-4 vt-child-profile" x-data="{editing: false}">
         <span id="editMeta" data-open-edit="{% if editing %}1{% else %}0{% endif %}" class="hidden"></span>
         <div class="flex flex-col justify-center items-center vt-childInfo gap-[0.5rem]">
-            <!-- <div> -->
-            <!-- <p class="text-sm text-gray-500">Name</p> -->
             <p class="text-3xl font-semibold text-gray-800">{{ child.name }}</p>
-            <!-- </div>
-            <div> -->
-            <!-- <p class="text-sm text-gray-500">Date of Birth</p> -->
             <p class="text-xl text-gray-700">Born on: {{ child.dob|short_date }}</p>
             <p class="text-xl text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full">{{ child.dob|age_text }}</p>
-            <!-- </div> -->
+            <p class="text-sm text-gray-600">Country: <span class="font-medium text-gray-600">{{ child.country or 'India' }}</span></p>
+            {% if reference_url %}
+            <a
+                href="{{ reference_url }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-sm text-blue-600 hover:underline"
+            >
+                Official schedule for {{ child.country or current_country or 'India' }}
+            </a>
+            {% endif %}
         </div>
         <div class="flex flex-col gap-2 w-full">
             {% if not guest_mode %}
@@ -90,6 +95,20 @@
                             required
                             class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                         />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1" for="country">Country</label>
+                        <select
+                            id="country"
+                            name="country"
+                            class="px-3 py-[0.7rem] border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                            required
+                        >
+                            {% set selected_country = (form_data.country if form_data and form_data.country else child.country or 'India') %}
+                            {% for c in available_countries %}
+                            <option value="{{ c }}" {% if c == selected_country %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="flex gap-2">

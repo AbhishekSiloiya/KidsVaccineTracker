@@ -77,22 +77,10 @@
                     {% endif %}
                 </div>
             </div>
-
             <!-- Header -->
             <header class="text-center mb-8 vt-header">
                 <h1 class="text-5xl font-bold text-gray-800 mb-4 vt-page-title">Child Vaccination Tracker</h1>
-                <div class="flex justify-between items-center max-w-[720px] mx-auto vt-container-narrow">
-                    <a
-                        href="https://iapindia.org/pdf/Indian-Pediatrics/2024/Indian-Pediatrics-February-2024-issue.pdf"
-                        class="text-gray-600 text-lg hover:underline vt-subtitle"
-                        >Based on IAP 2024 Schedule</a
-                    >
-                    <p class="text-lg font-medium text-gray-700 m-0 p-0 vt-subtitle">
-                        Country: <span class="font-semibold text-gray-800">India</span>
-                    </p>
-                </div>
             </header>
-
             {% with messages = get_flashed_messages(with_categories=True) %} {% if messages %}
             <div class="max-w-[800px] mx-auto mb-4 space-y-2">
                 {% for category, message in messages %} {% set styles = { 'success': 'bg-green-50 border

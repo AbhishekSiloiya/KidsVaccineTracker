@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from app.schedule_data import build_schedule_for_child
+from app.schedule_data import build_schedule_for_child, get_countries, get_reference_url
 
 
 def test_birth_due_is_dob():
@@ -30,4 +30,37 @@ def test_status_upcoming_and_due(monkeypatch):
     entries = build_schedule_for_child(base)
     six_weeks = next(e for e in entries if e['age'] == '6 Weeks')
     assert six_weeks['status_class'] in {'status-due','status-completed'}  # If date==today treated as due
+
+
+def test_available_countries_contains_india_and_uk():
+    countries = get_countries()
+    assert 'India' in countries
+    assert 'UK' in countries
+
+
+def test_country_specific_entries_india_vs_uk():
+    dob = date(2024, 1, 1)
+    india_entries = build_schedule_for_child(dob, country='India')
+    uk_entries = build_schedule_for_child(dob, country='UK')
+    india_ages = {e['age'] for e in india_entries}
+    uk_ages = {e['age'] for e in uk_entries}
+    assert '6 Weeks' in india_ages
+    assert '8 Weeks' not in india_ages
+    assert '8 Weeks' in uk_ages
+
+
+def test_reference_url_per_country():
+    assert 'nhs' in (get_reference_url('UK') or '').lower()
+    assert 'iap' in (get_reference_url('India') or '').lower()
+
+
+def test_composite_age_parsing_three_years_four_months():
+    # UK schedule includes '3 Years 4 Months'; ensure due date is computed correctly
+    dob = date(2020, 1, 15)
+    uk_entries = build_schedule_for_child(dob, country='UK')
+    target = next((e for e in uk_entries if e['age'].lower().startswith('3 years 4 months')), None)
+    assert target is not None
+    due = target['due_date']
+    # Expected: +3 years => 2023-01-15; +4 months => 2023-05-15
+    assert due.year == 2023 and due.month == 5 and due.day == 15
 
