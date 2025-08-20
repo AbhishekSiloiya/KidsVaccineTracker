@@ -162,3 +162,11 @@ build/
 # Test outputs
 test-results/
 playwright-report/ 
+
+# Python/App
+*.pyc
+*__pycache__/
+*.pytest_cache
+
+# Database
+instance/

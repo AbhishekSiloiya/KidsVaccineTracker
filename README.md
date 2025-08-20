@@ -1,98 +1,158 @@
-# VaccinationTracker
+# VaccinationTracker (Flask Edition)
 
-A responsive web application for tracking children's vaccination schedules based on the IAP 2024 schedule for India.
+Track children's vaccination schedules (IAP 2024 – India) with a Flask backend, server‑side persistence, auth, schedule computation, and calendar export.
 
-## Features
+## ✨ Features
 
-- **Child Profile Management**: Add and manage multiple children
-- **Vaccination Schedule**: Complete IAP 2024 vaccination schedule
-- **Status Tracking**: Track due, upcoming, and completed vaccinations
-- **Calendar Export**: Download vaccination schedule as ICS file
-- **Responsive Design**: Works on desktop, tablet, and mobile devices
-- **Offline Support**: Progressive Web App (PWA) functionality
-- **Data Persistence**: Local storage for data backup
-- **Form Validation**: Comprehensive input validation
+- Parent registration / login (session auth)
+- Multiple children per parent
+- Automatic schedule generation from DOB
+- Status tracking: Upcoming / Due (incl. due today) / Completed
+- Group completion per age milestone
+- Dashboard stats: overdue, due soon (≤30 days), upcoming
+- ICS calendar export (aggregate events)
+- Responsive UI (Tailwind CDN + semantic `vt-` classes)
+- PWA basics: `manifest.json`, `sw.js` (offline shell)
+- Consistent date formatting via Jinja filters
 
-## Getting Started
+## 🧑‍💻 Tech Stack
 
-1. **Clone or download** the project files
-2. **Open `index.html`** in a modern web browser
-3. **Start tracking** your child's vaccinations!
+| Layer | Tech |
+|-------|------|
+| Framework | Flask 3 |
+| ORM | Flask-SQLAlchemy (SQLite default) |
+| Templates | Jinja2 |
+| Styling | Tailwind CDN + custom CSS |
+| Env Config | python-dotenv |
+| Tests | pytest + coverage |
+| Lint / Sec | flake8, bandit, safety |
 
-## Usage
+## 🚀 Quick Start
 
-1. **Enter Child Information**: Provide the child's name and date of birth
-2. **Generate Schedule**: Click "Generate Schedule" to create the vaccination timeline
-3. **Track Progress**: Mark vaccinations as completed with dates
-4. **Export Calendar**: Download the schedule to your calendar app
-5. **Edit Information**: Modify child details anytime
+```powershell
+git clone https://github.com/AbhishekSiloiya/KidsVaccineTracker.git
 
-## Technical Details
+cd KidsVaccineTracker
 
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Styling**: Tailwind CSS for responsive design
-- **Storage**: Local Storage API for data persistence
-- **PWA**: Service Worker for offline functionality
-- **Validation**: Custom validation library
-- **Export**: ICS format for calendar integration
+python -m venv .venv
 
-## Development
+.\.venv\Scripts\Activate.ps1
 
-- Node.js 18+ recommended.
-- Install dependencies:
+pip install -r requirements.txt
 
-```bash
-npm install
+# Optional: create .env
+"SECRET_KEY=dev-secret" | Out-File -Append .env
+
+python main.py
 ```
 
-### Linting
+Default DB: `instance/children.db` (auto-created). Override with `DATABASE_URL` (or `SQLALCHEMY_DATABASE_URI`).
 
-```bash
-npm run lint       # check
-npm run lint:fix   # auto-fix
+## ⚙️ Configuration (.env)
+
+| Key | Purpose | Default |
+|-----|---------|---------|
+| SECRET_KEY | Session signing | dev-insecure-change-me |
+| DATABASE_URL | SQLAlchemy connection | SQLite file |
+
+Example:
+```
+SECRET_KEY=change-me
+DATABASE_URL=sqlite:///instance/children.db
 ```
 
-Notes:
-- The codebase avoids blocking browser APIs in production logic. We replaced direct `alert`/`confirm` with UI flows or error display. Any remaining usages are wrapped and explicitly allowed with inline eslint disables as needed.
-- `console` usage is minimized. Where necessary, logs are routed via controlled calls and annotated to satisfy lint rules.
+## 🧪 Testing & Quality
 
-### Testing
+Tools: `pytest`, `coverage`, `flake8`, `bandit`, `safety`.
 
-Jest with jsdom is configured. Useful commands:
+```powershell
+pytest
 
-```bash
-npm test           # run all tests
-npm run test:watch # watch mode
-npm run test:ci    # CI-friendly run with coverage
+flake8 app tests
 ```
 
-The test environment (`tests/setup.js`) provides:
-- Mocks for `localStorage`, `sessionStorage`, `alert`, `URL.createObjectURL`, and service worker registration
-- DOM helpers and global utilities
+Tests included:
+```
+tests/
+	conftest.py      # fixtures (app, in-memory DB)
+	test_schedule.py # schedule & status logic
+	test_models.py   # relationships & cascade delete
+	test_auth.py     # register/login
+```
+Planned: dashboard stats, completion endpoint, negative auth cases.
 
-### Validate Before Commit
+## 📦 CI/CD
 
-```bash
-npm run validate   # runs lint then tests
+GitHub Actions (`.github/workflows/ci.yml`):
+1. Matrix (3.10–3.12) run tests + coverage
+2. Lint (flake8)
+3. Security (bandit + safety)
+4. Build artifact (main)
+5. Release publish (main)
+
+## 🗄 Database
+
+- Auto `db.create_all()` for development.
+- Consider Alembic for production migrations.
+- Cascade delete: Parent → Children → Vaccinations.
+- Unique per child per vaccine name.
+
+## 🔐 Auth
+
+- Session-based with password hashing (Werkzeug).
+- Add rate limiting & stronger policies for production.
+
+## 📅 Calendar Export
+
+ICS file groups events by age band (one event containing multiple vaccines) for cleaner calendar views.
+
+## 🧱 Project Structure (excerpt)
+
+```
+app/               # Flask app package (models, views, schedule_data)
+templates/         # Jinja2 templates
+static/css/        # style.css, responsive.css
+manifest.json      # PWA manifest
+sw.js              # service worker
+tests/             # pytest suite
+requirements.txt   # pinned dependencies
+main.py            # entry point (create_app wrapper)
 ```
 
-## Browser Support
+## 🧹 Maintenance
 
-- Chrome 60+
-- Firefox 55+
-- Safari 11+
-- Edge 79+
+```powershell
+# Reset dev DB
+Remove-Item instance\children.db -ErrorAction Ignore
+python main.py
 
-## Data Privacy
+# Production example (Linux deploy)
+pip install gunicorn
+gunicorn -w 2 -b 0.0.0.0:8000 main:app
+```
 
-All data is stored locally in your browser. No information is sent to external servers.
+## 🛡 Hardening Roadmap
 
-## Contributing
+- CSRF tokens (Flask-WTF)
+- HTTPS / proxy headers
+- CSP headers
+- Rate limiting (Flask-Limiter)
+- Alembic migrations
+- Coverage threshold gate in CI
 
-- Create a feature branch
-- Ensure `npm run validate` passes
-- Open a PR describing changes
+## 🤝 Contributing
 
-## License
+1. Branch from `main`
+2. Add tests for new logic
+3. Run quality checks (tests, lint, security)
+    ```cmd
+    cd tests
+    pytest test_auth.py
+    pytest test_models.py
+    pytest test_schedule.py
+    ```
+4. Open PR with description & rationale
 
-This project is open source and available under the MIT License.
+## 📄 License
+
+MIT.

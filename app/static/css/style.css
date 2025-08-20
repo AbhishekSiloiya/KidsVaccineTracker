@@ -1,0 +1,72 @@
+/* Custom scrollbar styles (can't be replaced with Tailwind) */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Animation keyframes (complex animations that Tailwind can't handle easily) */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes vtFadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Helper class for fade-in animation */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* CSS Variables for theming */
+:root {
+    --emboss-bg-color: #edf3f9;
+}
+
+/* Emboss styling system */
+.emboss-bg {
+    background-color: var(--emboss-bg-color);
+}
+
+.emboss-outset {
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15), -1px -1px 2px rgba(255, 255, 255, 0.7),
+        inset -1px -1px 2px rgba(0, 0, 0, 0.1), inset 1px 1px 2px rgba(255, 255, 255, 0.7);
+    transition: all 0.2s ease-in-out;
+}
+
+.emboss-outset:hover {
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2), -1px -1px 2px rgba(255, 255, 255, 0.8),
+        inset 2px 2px 4px rgba(0, 0, 0, 0.15), inset -1px -1px 2px rgba(255, 255, 255, 0.7);
+}
+
+.emboss-inset {
+    box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.15), inset -1px -1px 2px rgba(255, 255, 255, 0.7),
+        1px 1px 2px rgba(0, 0, 0, 0.1), -1px -1px 2px rgba(255, 255, 255, 0.3);
+}

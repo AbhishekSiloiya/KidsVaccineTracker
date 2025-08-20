@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}VaccinationTracker - Child Vaccination Schedule{% endblock %}</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    screens: {
+                        // Custom breakpoints to match your original CSS
+                        xs: "480px",
+                        sm: "560px", // Your updated small breakpoint
+                        md: "770px", // Your original medium breakpoint
+                        lg: "1025px", // Your original large breakpoint
+                        xl: "1280px",
+                        "2xl": "1536px",
+
+                        // Max-width variants (for mobile-first approach)
+                        "max-xs": { max: "479px" },
+                        "max-sm": { max: "559px" }, // Less than 560px (your updated)
+                        "max-md": { max: "769px" }, // Less than 770px (your original)
+                        "max-lg": { max: "1024px" },
+                        "max-xl": { max: "1279px" },
+                    },
+                },
+            };
+        </script>
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        />
+        <!-- Core Styles -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}" /> -->
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#3b82f6" />
+        <meta name="description" content="Track your child's vaccination schedule with ease" />
+        <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+        {% block extra_head %}{% endblock %}
+    </head>
+    <body
+        class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen pb-8 font-['Inter',sans-serif] pt-2 lg:pt-4 max-sm:py-2"
+    >
+        <div class="mx-auto px-6 max-sm:px-3">
+            <!-- Top Actions -->
+            <div
+                id="topActions"
+                class="overflow-x-hidden flex justify-between items-center py-4 max-md:flex-nowrap max-md:gap-2 max-md:pt-1 max-md:whitespace-nowrap max-md:align-center max-sm:mb-3 max-sm:gap-2"
+            >
+                <div class="flex items-center gap-2 flex-wrap max-md:flex-nowrap max-md:w-auto max-sm:gap-0">
+                    <a
+                        href="{{ url_for('views.dashboard') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            dashboard
+                        </span>
+                        <span class="max-sm:hidden">Dashboard</span>
+                    </a>
+                    <a
+                        href="{{ url_for('views.add_child') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            person_add
+                        </span>
+                        <span class="max-sm:hidden">Add Child</span>
+                    </a>
+                    <a
+                        href="{{ url_for('views.compare_schedules') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            compare
+                        </span>
+                        <span class="max-sm:hidden">Compare</span>
+                    </a>
+                </div>
+
+                <div>
+                    {% if current_parent %}
+                    <span class="text-2xl text-gray-600 mr-1 max-md:text-base">Hi {{ current_parent.name }}</span>
+                    {% else %}
+                    <span class="text-2xl text-gray-600 mr-1 max-md:text-base">Guest Mode</span>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center gap-2 flex-wrap max-md:flex-nowrap max-md:w-auto max-sm:gap-0">
+                    {% if current_parent %}
+                    <a
+                        href="{{ url_for('auth.parent_profile', parent_id=current_parent.id) }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            account_circle
+                        </span>
+                        <span class="max-sm:hidden">Profile</span>
+                    </a>
+                    <a
+                        href="{{ url_for('auth.logout') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            logout
+                        </span>
+                        <span class="max-sm:hidden">Logout</span>
+                    </a>
+                    {% else %}
+                    <a
+                        href="{{ url_for('auth.login') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0 max-sm:text-transparent"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            login
+                        </span>
+                        <span class="max-sm:hidden">Login</span>
+                    </a>
+                    <a
+                        href="{{ url_for('auth.register') }}"
+                        class="flex gap-2 items-center text-indigo-600 bg-indigo-50 border-2 border-indigo-200 px-3 py-2 rounded-xl hover:bg-indigo-100 text-lg font-medium transition-all duration-200 ease-in-out hover:-translate-y-0.5 max-md:text-sm max-md:px-2 max-md:gap-0 max-sm:bg-transparent max-sm:border-0 max-sm:p-0 max-sm:text-transparent"
+                    >
+                        <span class="material-symbols-outlined text-2xl max-md:text-base max-sm:!text-2xl">
+                            how_to_reg
+                        </span>
+                        <span class="max-sm:hidden">Register</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- Header -->
+            <header class="text-center mb-8 max-md:mb-3">
+                <h1
+                    class="text-5xl font-bold text-gray-800 mb-4 max-md:text-4xl max-md:leading-tight max-md:mb-1 max-sm:text-3xl max-sm:mb-3 max-sm:leading-tight"
+                >
+                    Child Vaccination Tracker
+                </h1>
+            </header>
+            {% with messages = get_flashed_messages(with_categories=True) %} {% if messages %}
+            <div class="max-w-[800px] mx-auto mb-4 space-y-2">
+                {% for category, message in messages %} {% set styles = { 'success': 'bg-green-50 border
+                border-green-200 text-green-800', 'error': 'bg-red-50 border border-red-200 text-red-800', 'info':
+                'bg-blue-50 border border-blue-200 text-blue-800', 'warning': 'bg-yellow-50 border border-yellow-200
+                text-yellow-800' } %}
+                <div
+                    class="p-3 rounded-md text-sm {{ styles.get(category, 'bg-gray-50 border border-gray-200 text-gray-800') }}"
+                >
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %} {% endwith %} {% block content %}{% endblock %}
+        </div>
+
+        {% block scripts %} {% endblock %}
+    </body>
+</html>
