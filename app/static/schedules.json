@@ -34,5 +34,66 @@
       {"age": "14 Years", "vaccines": ["3-in-1 (Td/IPV) booster", "MenACWY"]},
       {"age": "Every Year", "vaccines": ["Flu (certain groups)"]}
     ]
+  },
+  "USA": {
+    "reference_url": "https://www.cdc.gov/vaccines/schedules/hcp/imz/child-adolescent.html",
+    "schedule": [
+      {"age": "Birth", "vaccines": ["Hepatitis B"]},
+      {"age": "2 Months", "vaccines": ["DTaP", "IPV", "Hib", "PCV", "Rotavirus", "Hepatitis B"]},
+      {"age": "4 Months", "vaccines": ["DTaP", "IPV", "Hib", "PCV", "Rotavirus"]},
+      {"age": "6 Months", "vaccines": ["DTaP", "IPV", "Hib", "PCV", "Rotavirus", "Hepatitis B", "Influenza (yearly)"]},
+      {"age": "12 Months", "vaccines": ["MMR", "Varicella", "Hepatitis A", "PCV"]},
+      {"age": "15 Months", "vaccines": ["DTaP", "Hib"]},
+      {"age": "18 Months", "vaccines": ["Hepatitis A"]},
+      {"age": "4-6 Years", "vaccines": ["DTaP", "IPV", "MMR", "Varicella"]},
+      {"age": "11-12 Years", "vaccines": ["Tdap", "HPV", "Meningococcal ACWY"]},
+      {"age": "16 Years", "vaccines": ["Meningococcal ACWY booster", "Meningococcal B"]}
+    ]
+  },
+  "Australia": {
+    "reference_url": "https://www.health.gov.au/topics/immunisation/immunisation-throughout-life/national-immunisation-program-schedule",
+    "schedule": [
+      {"age": "Birth", "vaccines": ["Hepatitis B"]},
+      {"age": "2 Months", "vaccines": ["Diphtheria-tetanus-pertussis", "Haemophilus influenzae type b", "Hepatitis B", "Poliomyelitis", "Pneumococcal", "Rotavirus"]},
+      {"age": "4 Months", "vaccines": ["Diphtheria-tetanus-pertussis", "Haemophilus influenzae type b", "Hepatitis B", "Poliomyelitis", "Pneumococcal", "Rotavirus"]},
+      {"age": "6 Months", "vaccines": ["Diphtheria-tetanus-pertussis", "Haemophilus influenzae type b", "Hepatitis B", "Poliomyelitis", "Pneumococcal"]},
+      {"age": "12 Months", "vaccines": ["Haemophilus influenzae type b", "Measles-mumps-rubella", "Meningococcal ACWY", "Pneumococcal"]},
+      {"age": "18 Months", "vaccines": ["Measles-mumps-rubella-varicella", "Diphtheria-tetanus-pertussis", "Haemophilus influenzae type b"]},
+      {"age": "4 Years", "vaccines": ["Diphtheria-tetanus-pertussis", "Poliomyelitis"]},
+      {"age": "10-15 Years", "vaccines": ["Human papillomavirus", "Diphtheria-tetanus-pertussis"]},
+      {"age": "Every Year", "vaccines": ["Influenza"]}
+    ]
+  },
+  "Germany": {
+    "reference_url": "https://www.rki.de/EN/Content/infections/Vaccination/recommandations/Recommendations_Germany.html",
+    "schedule": [
+      {"age": "6 Weeks", "vaccines": ["Rotavirus-1"]},
+      {"age": "2 Months", "vaccines": ["DTaP-IPV-Hib-HepB", "PCV", "Rotavirus-2"]},
+      {"age": "3 Months", "vaccines": ["DTaP-IPV-Hib-HepB", "Rotavirus-3"]},
+      {"age": "4 Months", "vaccines": ["DTaP-IPV-Hib-HepB", "PCV"]},
+      {"age": "11 Months", "vaccines": ["MMR", "Varicella", "Meningococcal C", "PCV"]},
+      {"age": "12 Months", "vaccines": ["DTaP-IPV-Hib-HepB"]},
+      {"age": "15 Months", "vaccines": ["MMR", "Varicella"]},
+      {"age": "5-6 Years", "vaccines": ["DTaP-IPV"]},
+      {"age": "9-14 Years", "vaccines": ["HPV"]},
+      {"age": "9-17 Years", "vaccines": ["Td-IPV", "Meningococcal ACWY"]},
+      {"age": "Every Year", "vaccines": ["Influenza"]}
+    ]
+  },
+  "Canada": {
+    "reference_url": "https://www.canada.ca/en/public-health/services/provincial-territorial-immunization-information/provincial-territorial-routine-vaccination-programs-infants-children.html",
+    "schedule": [
+      {"age": "Birth", "vaccines": ["Hepatitis B"]},
+      {"age": "2 Months", "vaccines": ["DTaP-IPV-Hib", "PCV", "Rotavirus", "Hepatitis B"]},
+      {"age": "4 Months", "vaccines": ["DTaP-IPV-Hib", "PCV", "Rotavirus"]},
+      {"age": "6 Months", "vaccines": ["DTaP-IPV-Hib", "Hepatitis B"]},
+      {"age": "12 Months", "vaccines": ["MMR", "Varicella", "PCV", "Meningococcal C"]},
+      {"age": "15 Months", "vaccines": ["DTaP-IPV-Hib"]},
+      {"age": "18 Months", "vaccines": ["MMR", "Varicella"]},
+      {"age": "4-6 Years", "vaccines": ["DTaP-IPV"]},
+      {"age": "9 Years", "vaccines": ["Hepatitis B"]},
+      {"age": "Grade 7", "vaccines": ["Tdap-IPV", "Meningococcal ACWY", "HPV"]},
+      {"age": "Every Year", "vaccines": ["Influenza"]}
+    ]
   }
 }

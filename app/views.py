@@ -492,3 +492,78 @@ def update_child(child_id):
         db.session.commit()
         build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
     return redirect(url_for('views.child_view', child_id=child.id))
+
+
+@views.route('/compare')
+def compare_schedules():
+    """Compare vaccination schedules between different countries"""
+    from .schedule_data import _load_schedules
+    
+    # Get selected countries from query params, default to India and UK
+    selected_countries = request.args.getlist('countries')
+    if not selected_countries:
+        selected_countries = ['India', 'UK']
+    
+    all_schedules = _load_schedules()
+    available_countries = list(all_schedules.keys())
+    
+    # Filter selected countries to only include available ones
+    selected_countries = [c for c in selected_countries if c in available_countries]
+    if not selected_countries:
+        selected_countries = ['India']
+    
+    # Get schedules for selected countries
+    comparison_data = {}
+    for country in selected_countries:
+        comparison_data[country] = {
+            'schedule': all_schedules[country].get('schedule', []),
+            'reference_url': all_schedules[country].get('reference_url', '')
+        }
+    
+    # Create a unified view by collecting all unique age periods
+    all_ages = set()
+    for country_data in comparison_data.values():
+        for item in country_data['schedule']:
+            all_ages.add(item['age'])
+    
+    # Sort ages in a meaningful way (by approximate numeric value)
+    def age_sort_key(age_str):
+        # Extract first number for sorting
+        import re
+        match = re.search(r'(\d+)', age_str)
+        if match:
+            num = int(match.group(1))
+            # Adjust for units (convert to days for comparison)
+            if 'week' in age_str.lower():
+                return num * 7
+            elif 'month' in age_str.lower():
+                return num * 30
+            elif 'year' in age_str.lower():
+                return num * 365
+            else:
+                return num
+        # Handle special cases
+        if 'birth' in age_str.lower():
+            return 0
+        return 999999  # Put unmatched at end
+    
+    sorted_ages = sorted(all_ages, key=age_sort_key)
+    
+    # Build comparison table
+    comparison_table = []
+    for age in sorted_ages:
+        row = {'age': age, 'countries': {}}
+        for country in selected_countries:
+            # Find vaccines for this age in this country
+            vaccines = []
+            for item in comparison_data[country]['schedule']:
+                if item['age'] == age:
+                    vaccines.extend(item['vaccines'])
+            row['countries'][country] = vaccines
+        comparison_table.append(row)
+    
+    return render_template('compare_schedules.html',
+                         comparison_table=comparison_table,
+                         selected_countries=selected_countries,
+                         available_countries=available_countries,
+                         comparison_data=comparison_data)
