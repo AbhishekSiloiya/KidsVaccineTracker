@@ -52,7 +52,7 @@
                 <!-- Popup action list (reuses id=topActions for continuity) -->
                 <div
                     id="topActions"
-                    class="flex flex-col items-stretch gap-2 mb-2"
+                    class="hidden flex-col items-stretch gap-2 mb-2"
                     role="menu"
                     aria-label="Quick actions"
                 >
@@ -188,6 +188,7 @@
 
                 const openMenu = () => {
                     menu.classList.remove("hidden");
+                    menu.classList.add("flex");
                     // Apply staggered animation by adding open class and individual item delays
                     menu.classList.add("animate-in", "fade-in", "slide-in-from-bottom-2", "duration-300");
                     const items = menu.querySelectorAll("a");
@@ -198,8 +199,10 @@
                     toggle.setAttribute("aria-expanded", "true");
                     if (icon) icon.textContent = "close";
                 };
+
                 const closeMenu = () => {
                     menu.classList.add("hidden");
+                    menu.classList.remove("flex");
                     menu.classList.remove("animate-in", "fade-in", "slide-in-from-bottom-2");
                     const items = menu.querySelectorAll("a");
                     items.forEach((item) => {
@@ -209,6 +212,10 @@
                     toggle.setAttribute("aria-expanded", "false");
                     if (icon) icon.textContent = "add";
                 };
+
+                // Initialize menu as closed
+                closeMenu();
+
                 const toggleMenu = (e) => {
                     if (e) e.stopPropagation();
                     if (menu.classList.contains("hidden")) openMenu();

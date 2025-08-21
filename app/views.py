@@ -82,10 +82,8 @@ def age_text(value):
 
 @views.route('/')
 def home():
-    # Render the base layout so linked CSS/JS are requested and applied
-    # Default to India when no specific child context
-    default_country = 'India'
-    return render_template('base.html', reference_url=get_reference_url(default_country), reference_label='Official schedule', current_country=default_country)
+    # Redirect to add_child as the default landing page
+    return redirect(url_for('views.add_child'))
 
 def base_template():  # Optional helper
     return render_template('base.html')

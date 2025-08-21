@@ -70,3 +70,78 @@
     box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.15), inset -1px -1px 2px rgba(255, 255, 255, 0.7),
         1px 1px 2px rgba(0, 0, 0, 0.1), -1px -1px 2px rgba(255, 255, 255, 0.3);
 }
+
+/* Custom text sizes for better mobile responsiveness */
+.text-2xs {
+    font-size: 0.625rem; /* 10px */
+    line-height: 0.75rem; /* 12px */
+}
+
+.comparison-table .vaccine-pill {
+    font-size: 1rem;
+    padding: 0.25rem 0.75rem;
+    margin: 0.125rem 0.125rem 0.125rem 0;
+}
+
+.comparison-age-col div {
+    font-size: 1rem;
+}
+
+@media (max-width: 559px) {
+    .text-2xs {
+        font-size: 0.5rem; /* 8px */
+        line-height: 0.625rem; /* 10px */
+    }
+}
+
+/* Table responsiveness improvements */
+.comparison-age-col {
+    width: 8rem;
+    min-width: 8rem;
+    max-width: 8rem;
+    word-wrap: break-word;
+    hyphens: auto;
+}
+
+.comparison-age-col div {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.comparison-country-col {
+    min-width: 8rem;
+}
+
+@media (max-width: 559px) {
+    .comparison-table {
+        font-size: 0.75rem;
+    }
+
+    .comparison-age-col {
+        width: 5rem !important;
+        max-width: 5rem !important;
+        min-width: 5rem !important;
+    }
+
+    .comparison-age-col div {
+        font-size: 0.8rem;
+        line-height: 0.8rem;
+        text-align: center;
+        padding: 0.1rem;
+    }
+
+    .comparison-country-col {
+        min-width: 6rem;
+        width: auto;
+    }
+
+    /* Make vaccine pills smaller and more compact on mobile */
+    .comparison-table .vaccine-pill {
+        font-size: 0.7rem;
+        padding: 0.125rem 0.375rem;
+        margin: 0.125rem 0.125rem 0.125rem 0;
+        line-height: 1;
+        display: inline-block;
+    }
+}
