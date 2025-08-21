@@ -52,33 +52,38 @@
     <!-- Comparison Table -->
     {% if comparison_table %}
     <div class="emboss-bg rounded-2xl shadow-lg overflow-hidden max-sm:rounded-lg">
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
+        <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <table
+                class="min-w-full table-fixed max-sm:w-[calc(100vw-2rem)] comparison-table"
+                style="--country-count: {{ selected_countries|length }};"
+            >
                 <!-- Table Header -->
                 <thead class="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
                         <th
-                            class="px-6 py-4 text-left font-bold text-gray-800 sticky left-0 bg-gray-50 z-10 border-r-2 border-gray-200 max-sm:px-3 max-sm:py-3"
+                            class="px-3 py-4 text-left font-bold text-gray-800 sticky left-0 bg-gray-50 z-10 border-r-2 border-gray-200 max-sm:px-2 max-sm:py-3 comparison-age-col"
                         >
-                            <div class="flex items-center gap-2">
-                                <span class="material-symbols-outlined text-xl">schedule</span>
-                                <span class="max-sm:text-sm">Age</span>
+                            <div class="flex justify-center items-center gap-1 max-sm:flex-col max-sm:gap-0">
+                                <span class="material-symbols-outlined text-lg max-sm:text-sm">schedule</span>
+                                <span class="text-sm max-sm:text-xs max-sm:leading-tight">Age</span>
                             </div>
                         </th>
                         {% for country in selected_countries %}
                         <th
-                            class="px-6 py-4 text-left font-bold text-gray-800 border-r border-gray-200 max-sm:px-3 max-sm:py-3"
+                            class="px-4 py-4 text-left font-bold text-gray-800 border-r border-gray-200 max-sm:px-2 max-sm:py-3 comparison-country-col"
                         >
                             <div class="flex flex-col items-center gap-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-xl">flag</span>
-                                    <span class="max-sm:text-sm">{{ country }}</span>
+                                <div class="flex items-center gap-1 max-sm:flex-col max-sm:gap-0">
+                                    <span class="material-symbols-outlined text-lg max-sm:text-sm">flag</span>
+                                    <span class="text-sm max-sm:text-xs font-semibold max-sm:leading-tight text-center"
+                                        >{{ country }}</span
+                                    >
                                 </div>
                                 {% if comparison_data[country].reference_url %}
                                 <a
                                     href="{{ comparison_data[country].reference_url }}"
                                     target="_blank"
-                                    class="text-xs text-indigo-600 hover:underline flex items-center gap-1"
+                                    class="text-xs text-indigo-600 hover:underline flex items-center gap-1 max-sm:hidden"
                                 >
                                     <span class="material-symbols-outlined text-sm">open_in_new</span>
                                     Official Source
@@ -95,24 +100,30 @@
                     {% for row in comparison_table %}
                     <tr class="border-b border-gray-200 hover:bg-gray-50 transition-colors">
                         <td
-                            class="px-6 py-4 font-semibold text-gray-700 sticky left-0 bg-white z-10 border-r-2 border-gray-200 max-sm:px-3 max-sm:py-3"
+                            class="px-3 py-4 font-semibold text-gray-700 sticky left-0 bg-white z-10 border-r-2 border-gray-200 max-sm:px-2 max-sm:py-3 comparison-age-col"
                         >
-                            <div class="whitespace-nowrap max-sm:text-sm">{{ row.age }}</div>
+                            <div
+                                class="text-xs max-sm:text-2xs leading-tight max-sm:leading-none break-words text-center"
+                            >
+                                {{ row.age }}
+                            </div>
                         </td>
                         {% for country in selected_countries %}
-                        <td class="px-6 py-4 border-r border-gray-200 align-top max-sm:px-3 max-sm:py-3">
+                        <td
+                            class="px-4 py-4 border-r border-gray-200 align-top max-sm:px-2 max-sm:py-3 comparison-country-col"
+                        >
                             {% if row.countries[country] %}
-                            <div class="space-y-1">
+                            <div class="space-y-1 max-sm:space-y-0.5">
                                 {% for vaccine in row.countries[country] %}
                                 <span
-                                    class="inline-block bg-indigo-100 text-indigo-800 text-sm px-3 py-1 rounded-full font-medium max-sm:text-xs max-sm:px-2 max-sm:py-0.5"
+                                    class="vaccine-pill inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full font-medium max-sm:text-2xs max-sm:px-1.5 max-sm:py-0.5 max-sm:mb-0.5 max-sm:mr-0.5"
                                 >
                                     {{ vaccine }}
                                 </span>
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <span class="text-gray-400 italic text-sm">No vaccines</span>
+                            <span class="text-gray-400 italic text-xs max-sm:text-2xs">No vaccines</span>
                             {% endif %}
                         </td>
                         {% endfor %}
