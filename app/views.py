@@ -127,8 +127,8 @@ def add_child():
             else:
                 # Guest flow: allow only one child in session; block adding a second
                 if session.get('guest_child'):
-                    flash('Adding more than one child requires an account. Please register or log in.', 'error')
-                    return redirect(url_for('auth.register'))
+                    flash('Adding more than one child requires an account. Please log in or create an account.', 'error')
+                    return redirect(url_for('auth.login'))
                 session['guest_child'] = {'name': name, 'dob': dob, 'country': country}
                 # Redirect to guest child view so they can manage schedule
                 return redirect(url_for('views.guest_child_view'))
@@ -275,9 +275,34 @@ def dashboard():
             schedule_entries = build_schedule_for_child(dob_date, child=None, country=guest.get('country') or 'India')
         except Exception:
             schedule_entries = []
+        
+        # Calculate stats for guest child
+        completed_map = session.get('guest_child_completed', {}) or {}
+        today = date.today()
+        due_soon_window = today + timedelta(days=30)
+        completed_count = overdue = due_soon = upcoming = 0
+        next_due_date = None
+        next_due_vaccines = []
+        
+        for entry in schedule_entries:
+            if completed_map.get(entry['age']):
+                completed_count += len(entry['vaccines'])
+            else:
+                if entry['due_date'] <= today:
+                    overdue += len(entry['vaccines'])
+                elif today < entry['due_date'] <= due_soon_window:
+                    due_soon += len(entry['vaccines'])
+                else:
+                    upcoming += len(entry['vaccines'])
+                
+                # Find the earliest next due date among incomplete vaccinations
+                if not next_due_date or entry['due_date'] < next_due_date:
+                    next_due_date = entry['due_date']
+                    next_due_vaccines = entry['vaccines']
+        
         # Render a minimal dashboard using base template
         cur_country = guest.get('country') or 'India'
-        return render_template('dashboard.html', children=[], child_stats=[], overall_completed=0, overall_overdue=0, overall_upcoming=0, guest_child=guest, guest_schedule=schedule_entries, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
+        return render_template('dashboard.html', children=[], child_stats=[], overall_completed=completed_count, overall_overdue=overdue, overall_upcoming=due_soon + upcoming, guest_child=guest, guest_schedule=schedule_entries, guest_next_due=next_due_date, guest_next_vaccines=next_due_vaccines, reference_url=get_reference_url(cur_country), reference_label='Official schedule', current_country=cur_country)
     children = Child.query.filter_by(parent_id=parent_id).order_by(Child.created_at.desc()).all()
     today = date.today()
     due_soon_window = today + timedelta(days=30)
