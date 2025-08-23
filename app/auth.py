@@ -90,6 +90,11 @@ def register():
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+	# Check for message parameter and show appropriate flash message
+	message_type = request.args.get('message')
+	if message_type == 'download_calendar' and request.method == 'GET':
+		flash('Please log in to download the vaccination calendar.', 'info')
+	
 	if request.method == 'POST':
 		email = request.form.get('email', '').strip().lower()
 		password = request.form.get('password', '')
