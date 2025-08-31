@@ -38,6 +38,20 @@
         <meta name="theme-color" content="#3b82f6" />
         <meta name="description" content="Track your child's vaccination schedule with ease" />
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
+        <!-- Favicon -->
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="192x192"
+            href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
+        />
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}" />
         {% block extra_head %}{% endblock %}
     </head>
     <body

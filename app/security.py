@@ -44,12 +44,27 @@ def sanitize_text(value: str, max_len: int = 200) -> str:
 
 
 def validate_name(name: str, field_label: str = 'Name') -> list[str]:
-    """Allow letters, spaces, hyphen, apostrophe. Enforce min length."""
-    errs = []
-    if not name or len(name.strip()) < 2:
+    """Allow Unicode letters, digits, spaces, hyphen (-), and apostrophes (straight or curly).
+
+    Disallow other punctuation and symbols. Enforce minimum length of 2.
+    """
+    errs: list[str] = []
+    if name is None:
+        errs.append(f'{field_label} is required.')
+        return errs
+    s = name.strip()
+    if len(s) < 2:
         errs.append(f'{field_label} must be at least 2 characters.')
         return errs
-    if not re.fullmatch(r"[A-Za-z][A-Za-z '\-]{1,98}", name.strip()):
+
+    allowed_extra = {"-", "'", "’", " "}
+    invalid = False
+    for ch in s:
+        if ch.isalpha() or ch.isdigit() or ch.isspace() or ch in allowed_extra:
+            continue
+        invalid = True
+        break
+    if invalid:
         errs.append(f'{field_label} contains invalid characters.')
     return errs
 
