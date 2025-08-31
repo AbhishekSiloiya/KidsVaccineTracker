@@ -5,6 +5,7 @@ from datetime import datetime
 from . import db
 from .models import Parent, Child
 from .schedule_data import build_schedule_for_child, get_reference_url
+from .security import sanitize_text, validate_name, validate_email, has_disallowed_keywords
 
 auth = Blueprint('auth', __name__, template_folder='template')
 
@@ -55,15 +56,15 @@ def login_required(f):
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
 	if request.method == 'POST':
-		name = request.form.get('name', '').strip()
-		email = request.form.get('email', '').strip().lower()
-		age = request.form.get('age', '').strip()
+		name = sanitize_text(request.form.get('name', '').strip(), max_len=80)
+		email = sanitize_text(request.form.get('email', '').strip().lower(), max_len=120)
+		age = sanitize_text(request.form.get('age', '').strip(), max_len=3)
 		password = request.form.get('password', '')
 		errors = []
-		if not name:
-			errors.append('Name required.')
-		if not email:
-			errors.append('Email required.')
+		errors += validate_name(name, field_label='Name')
+		errors += validate_email(email)
+		if has_disallowed_keywords(name) or has_disallowed_keywords(email):
+			errors.append('Input contains disallowed words.')
 		if not age:
 			errors.append('Age required.')
 		if Parent.query.filter_by(email=email).first():
@@ -96,7 +97,7 @@ def login():
 		flash('Please log in to download the vaccination calendar.', 'info')
 	
 	if request.method == 'POST':
-		email = request.form.get('email', '').strip().lower()
+		email = sanitize_text(request.form.get('email', '').strip().lower(), max_len=120)
 		password = request.form.get('password', '')
 		parent = Parent.query.filter_by(email=email).first()
 		if parent and check_password_hash(parent.password_hash, password):
@@ -121,12 +122,14 @@ def parent_profile(parent_id):
 		return redirect(url_for('auth.login'))
 	errors = []
 	if request.method == 'POST':
-		name = request.form.get('name', '').strip()
-		age = request.form.get('age', '').strip()
+		name = sanitize_text(request.form.get('name', '').strip(), max_len=80)
+		age = sanitize_text(request.form.get('age', '').strip(), max_len=3)
 		if not name:
 			errors.append('Name required.')
 		if not age:
 			errors.append('Age required.')
+		if has_disallowed_keywords(name):
+			errors.append('Input contains disallowed words.')
 		try:
 			age_val = int(age) if age else None
 		except ValueError:

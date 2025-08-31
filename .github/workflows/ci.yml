@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests (pytest)
         run: |
-          pytest --maxfail=1 --disable-warnings -q --cov=app --cov-report=xml --cov-report=term
+          pytest -q --maxfail=1 --disable-warnings --cov=app --cov-report=xml --cov-report=term
           if [ ! -f coverage.xml ] || ! grep -q "<coverage" coverage.xml; then echo "Coverage report not generated properly"; exit 1; fi
 
       - name: Coverage
