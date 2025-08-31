@@ -16,7 +16,7 @@ def test_add_child_sanitizes_and_blocks_keywords(client):
 
 def test_register_validates_email_and_age(client):
     # Invalid email and age non-numeric
-    resp = client.post('/register', data={
+    resp = client.post('/auth/register', data={
         'name': 'Valid Name',
         'email': 'not-an-email',
         'age': 'abc',
@@ -38,6 +38,6 @@ def test_guest_mark_complete_sanitizes_and_redirects(client):
 
 def test_login_sanitizes_email(client):
     # Ensure route handles sanitized email gracefully even if not exists
-    resp = client.post('/login', data={'email': "user@example.com; SELECT *", 'password': 'x'})
+    resp = client.post('/auth/login', data={'email': "user@example.com; SELECT *", 'password': 'x'})
     assert resp.status_code == 200
     assert 'Invalid credentials' in resp.get_data(as_text=True)
