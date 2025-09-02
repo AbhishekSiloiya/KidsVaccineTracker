@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta, timezone
 from .models import Child, Vaccination, Parent
 from . import db
 from .schedule_data import build_schedule_for_child, get_reference_url, get_countries
+from .security import sanitize_text, validate_name, has_disallowed_keywords
 
 # Specify the template_folder because the project currently uses 'template' (singular)
 # If you later rename the folder to 'templates', you can remove the parameter.
@@ -90,8 +91,10 @@ def base_template():  # Optional helper
 
 def _validate_child_form(name: str, dob_str: str, country: str | None = None):
     errors = []
-    if not name or len(name.strip()) < 2:
-        errors.append('Child name must be at least 2 characters.')
+    if has_disallowed_keywords(name):
+        errors.append('Child name contains disallowed words.')
+    # Validate name with stricter rules
+    errors += validate_name(name, field_label='Child name')
     if not dob_str:
         errors.append('Date of birth is required.')
     else:
@@ -112,9 +115,9 @@ def add_child():
     form_success = None
     form_data = {}
     if request.method == 'POST':
-        name = request.form.get('child_name', '').strip()
-        dob = request.form.get('dob', '')
-        country = request.form.get('country', 'India')
+        name = sanitize_text(request.form.get('child_name', '').strip(), max_len=80)
+        dob = sanitize_text(request.form.get('dob', '').strip(), max_len=10)
+        country = sanitize_text(request.form.get('country', 'India').strip(), max_len=40)
         form_data = {'child_name': name, 'dob': dob, 'country': country}
         form_errors = _validate_child_form(name, dob, country)
         if not form_errors:
@@ -207,8 +210,8 @@ def guest_mark_vaccination_complete():
     guest = session.get('guest_child')
     if not guest:
         return redirect(url_for('views.add_child'))
-    age = request.form.get('age')
-    date_str = request.form.get('date')
+    age = sanitize_text(request.form.get('age', ''), max_len=40)
+    date_str = sanitize_text(request.form.get('date', ''), max_len=10)
     if not age or not date_str:
         return redirect(url_for('views.guest_child_view'))
     # Persist completion by age label
@@ -223,9 +226,9 @@ def guest_update_child():
     guest = session.get('guest_child')
     if not guest:
         return redirect(url_for('views.add_child'))
-    name = request.form.get('child_name', '').strip()
-    dob_str = request.form.get('dob', '').strip()
-    country = request.form.get('country', 'India')
+    name = sanitize_text(request.form.get('child_name', '').strip(), max_len=80)
+    dob_str = sanitize_text(request.form.get('dob', '').strip(), max_len=10)
+    country = sanitize_text(request.form.get('country', 'India').strip(), max_len=40)
     errors = _validate_child_form(name, dob_str, country)
     if errors:
         # Render view with errors and keep previous saved guest data
@@ -479,9 +482,9 @@ def update_child(child_id):
         flash('Please log in first.', 'error')
         return redirect(url_for('auth.login'))
     child = Child.query.filter_by(id=child_id, parent_id=parent_id).first_or_404()
-    name = request.form.get('child_name', '').strip()
-    dob_str = request.form.get('dob', '').strip()
-    country = request.form.get('country', 'India')
+    name = sanitize_text(request.form.get('child_name', '').strip(), max_len=80)
+    dob_str = sanitize_text(request.form.get('dob', '').strip(), max_len=10)
+    country = sanitize_text(request.form.get('country', 'India').strip(), max_len=40)
     errors = _validate_child_form(name, dob_str, country)
     if errors:
         # Re-render child view with errors

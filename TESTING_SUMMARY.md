@@ -56,21 +56,22 @@ This document summarizes the comprehensive testing and change management system 
 - ✅ **GitHub Actions**: Automated CI/CD (Python matrix)
 
 **Test Types Implemented**:
-- ✅ **Model Tests** (relationships, cascade delete)
-- ✅ **Schedule Logic Tests** (date calculation, status classification)
-- ✅ **Auth Flow Test** (register + login basic path)
-- ⏳ **View / Endpoint Tests** (to expand: dashboard stats, marking completion)
-- ⏳ **Error Handling Tests** (planned)
+- ✅ Model tests (relationships, cascade delete)
+- ✅ Schedule logic tests (date calculation, status classification)
+- ✅ Auth flow tests (register + login basic path)
+- ✅ Security/sanitization tests (input cleaning, disallowed keywords, route hardening)
+- ⏳ View/endpoint tests expansion (dashboard stats, full completion flows)
+- ⏳ Error handling tests (planned)
 
 ### 2. **Test Structure**
 
 ```
 tests/
-├── conftest.py          # Pytest fixtures (Flask app + in-memory DB)
-├── test_schedule.py     # Schedule date & status logic
-├── test_models.py       # Parent/Child/Vaccination + cascade
-├── test_auth.py         # Registration & login flow
-└── (planned) test_views.py / test_completion.py
+├── conftest.py       # Pytest fixtures (Flask app + in-memory DB)
+├── test_schedule.py  # Schedule date & status logic
+├── test_models.py    # Parent/Child/Vaccination + cascade
+├── test_auth.py      # Registration & login flow
+└── test_security.py  # Sanitization, disallowed keywords, endpoint hardening (/auth/*)
 ```
 
 ### 3. **Test Coverage**
@@ -81,10 +82,12 @@ tests/
 - ✅ Schedule computation (_calc_due_date logic via build wrapper)
 - ✅ Vaccination row creation + cascade delete
 - ✅ Basic auth (register/login)
+- ✅ Input sanitization and disallowed keyword detection
+- ✅ Guest flow security checks (e.g., completion path, login sanitization)
 
 **Planned Coverage Additions**:
 - Dashboard aggregation counts (overdue vs due soon vs upcoming)
-- Vaccination completion endpoint (/child/<id>/complete)
+- Vaccination completion endpoint (/child/<id>/complete) — expand beyond current security-path checks
 - Date formatting filters (friendly_date, short_date)
 - Negative & edge cases: invalid registration, duplicate email, future DOB rejection
 
@@ -243,7 +246,6 @@ pytest --durations=10
 
 - ✅ **README.md**: Project overview and setup
 - ✅ **CHANGELOG.md**: Version history and changes
-- ✅ **tests/README.md**: Comprehensive testing guide
 - ✅ **TESTING_SUMMARY.md**: This summary document
 
 ### 2. **Documentation Standards**
@@ -263,7 +265,7 @@ pytest --durations=10
 
 ### 1. **Code Quality**
 
-- ✅ **Consistent Code Style**: ESLint enforces standards
+- ✅ **Consistent Code Style**: flake8 enforces standards
 - ✅ **Bug Prevention**: Comprehensive test coverage
 - ✅ **Refactoring Safety**: Tests catch regressions
 - ✅ **Documentation**: Clear code and process documentation
@@ -309,10 +311,12 @@ pytest --durations=10
 
 ### 2. **Resources**
 
-- [Jest Documentation](https://jestjs.io/docs/getting-started)
-- [Testing Best Practices](https://github.com/goldbergyoni/javascript-testing-best-practices)
+- [pytest Documentation](https://docs.pytest.org/)
+- [coverage.py Documentation](https://coverage.readthedocs.io/)
+- [flake8 User Guide](https://flake8.pycqa.org/)
+- [Bandit Documentation](https://bandit.readthedocs.io/)
+- [Safety Documentation](https://docs.pyup.io/docs/safety)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [ESLint Rules](https://eslint.org/docs/rules/)
 
 ---
 
