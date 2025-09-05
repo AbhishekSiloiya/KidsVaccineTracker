@@ -55,9 +55,30 @@
         {% block extra_head %}{% endblock %}
     </head>
     <body
-        class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen py-8 font-['Inter',sans-serif] max-sm:py-2"
+        class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen py-2 pb-14 font-['Inter',sans-serif] max-sm:py-2 max-sm:pb-8"
     >
         <div class="mx-auto px-6">
+            <!-- VaxGuard Header -->
+            <div class="flex flex-col items-center justify-center mt-2 mb-6">
+                <a
+                    href="{{ url_for('views.add_child') }}"
+                    class="text-decoration-none hover:opacity-90 transition-opacity duration-200"
+                >
+                    <div
+                        class="flex flex-row items-center justify-center gap-4 mb-1 w-full max-w-lg max-sm:gap-2 max-sm:max-w-xs"
+                    >
+                        <img
+                            src="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
+                            alt="VaxGuard Logo"
+                            class="w-16 h-16 max-md:w-12 max-md:h-12 max-sm:w-10 max-sm:h-10"
+                        />
+                        <h2 class="text-5xl font-bold text-gray-800 max-md:text-3xl max-sm:text-2xl">VaxGuard</h2>
+                    </div>
+                </a>
+                <p class="text-lg text-gray-700 text-center max-md:text-base max-sm:text-xs">
+                    Your child vaccination tracker and reminder
+                </p>
+            </div>
             <!-- Floating Action Button + Menu -->
             <div
                 id="fabContainer"
@@ -77,7 +98,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 dashboard
                             </span>
@@ -89,7 +110,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 person_add
                             </span>
@@ -101,7 +122,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 compare
                             </span>
@@ -117,7 +138,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 account_circle
                             </span>
@@ -129,7 +150,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 logout
                             </span>
@@ -144,7 +165,7 @@
                             role="menuitem"
                         >
                             <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
+                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
                             >
                                 login
                             </span>

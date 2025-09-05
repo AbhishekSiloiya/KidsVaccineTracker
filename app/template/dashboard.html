@@ -138,23 +138,80 @@
                     <span class="material-symbols-outlined">read_more</span>
                     View
                 </a>
-                <form
-                    method="POST"
-                    action="{{ url_for('views.delete_child', child_id=s.child.id) }}"
-                    class="w-full"
-                    onsubmit="return confirm('Delete {{ s.child.name }} and all vaccination records? This cannot be undone.');"
+                <button
+                    type="button"
+                    onclick="showDeleteModal('{{ s.child.name }}', `{{ url_for('views.delete_child', child_id=s.child.id) }}`)"
+                    class="flex flex-row justify-center items-center gap-1 w-full bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700"
                 >
-                    <button
-                        type="submit"
-                        class="flex flex-row justify-center items-center gap-1 w-full bg-red-600 text-white px-3 py-1 rounded-md text-sm hover:bg-red-700"
-                    >
-                        <span class="material-symbols-outlined">delete</span>
-                        Delete
-                    </button>
-                </form>
+                    <span class="material-symbols-outlined">delete</span>
+                    Delete
+                </button>
             </div>
         </div>
         {% endfor %} {% endif %}
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 mx-4 max-w-md w-full shadow-2xl">
+        <div class="flex items-center mb-4">
+            <span class="material-symbols-outlined text-red-600 text-3xl mr-3">warning</span>
+            <h3 class="text-xl font-bold text-gray-800">Confirm Deletion</h3>
+        </div>
+        <p class="text-gray-600 mb-6">
+            Are you sure you want to delete <strong id="childNameToDelete"></strong> and all vaccination records?
+            <br /><br />
+            <span class="text-red-600 font-medium">This action cannot be undone.</span>
+        </p>
+        <div class="flex gap-3 justify-end">
+            <button
+                type="button"
+                onclick="hideDeleteModal()"
+                class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+            >
+                Cancel
+            </button>
+            <form id="deleteForm" method="POST" action="" class="inline">
+                <button
+                    type="submit"
+                    class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                >
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showDeleteModal(childName, deleteUrl) {
+        document.getElementById("childNameToDelete").textContent = childName;
+        document.getElementById("deleteForm").action = deleteUrl;
+        const modal = document.getElementById("deleteModal");
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+    }
+
+    function hideDeleteModal() {
+        const modal = document.getElementById("deleteModal");
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+
+    // Close modal when clicking outside
+    document.getElementById("deleteModal").addEventListener("click", function (e) {
+        if (e.target === this) {
+            hideDeleteModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            hideDeleteModal();
+        }
+    });
+</script>
+
 {% endblock %}

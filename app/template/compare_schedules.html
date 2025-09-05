@@ -1,4 +1,46 @@
-{% extends "base.html" %} {% block title %}Schedule Comparison - VaccinationTracker{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}Schedule Comparison - VaccinationTracker{% endblock %} {% block extra_head %}
+<style>
+    .comparison-table {
+        table-layout: fixed;
+    }
+
+    .comparison-age-col {
+        width: 15%;
+        min-width: 80px;
+    }
+
+    .comparison-country-col {
+        width: calc((85% / var(--country-count, 1)));
+        min-width: 150px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    @media (max-width: 559px) {
+        .comparison-age-col {
+            width: 20%;
+            min-width: 60px;
+        }
+
+        .comparison-country-col {
+            width: calc((80% / var(--country-count, 1)));
+            min-width: 120px;
+        }
+
+        .vaccine-pill {
+            display: block !important;
+            margin-bottom: 0.25rem !important;
+            margin-right: 0 !important;
+            width: 100% !important;
+            text-align: center;
+            word-break: break-word;
+            hyphens: auto;
+            white-space: normal;
+            line-height: 1.2;
+        }
+    }
+</style>
+{% endblock %} {% block content %}
 <div class="max-w-7xl mx-auto">
     <!-- Page Header -->
     <div class="emboss-bg p-6 rounded-2xl shadow-lg mb-8 max-md:p-4 max-sm:p-3 max-sm:mb-6">
@@ -116,7 +158,8 @@
                             <div class="space-y-1 max-sm:space-y-0.5">
                                 {% for vaccine in row.countries[country] %}
                                 <span
-                                    class="vaccine-pill inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full font-medium max-sm:text-2xs max-sm:px-1.5 max-sm:py-0.5 max-sm:mb-0.5 max-sm:mr-0.5"
+                                    class="vaccine-pill inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-0.5 rounded-full font-medium max-sm:text-2xs max-sm:px-1.5 max-sm:py-0.5 max-sm:mb-0.5 max-sm:mr-0.5 max-sm:break-words max-sm:hyphens-auto max-sm:leading-tight max-sm:max-w-full max-sm:whitespace-normal"
+                                    style="word-break: break-word; overflow-wrap: break-word"
                                 >
                                     {{ vaccine }}
                                 </span>

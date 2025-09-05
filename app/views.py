@@ -126,7 +126,8 @@ def add_child():
                 child = Child(name=name, dob=datetime.strptime(dob, '%Y-%m-%d').date(), parent_id=parent_id, country=country)
                 db.session.add(child)
                 db.session.commit()
-                form_success = 'Child added successfully.'
+                # Redirect to the newly created child's view
+                return redirect(url_for('views.child_view', child_id=child.id))
             else:
                 # Guest flow: allow only one child in session; block adding a second
                 if session.get('guest_child'):
