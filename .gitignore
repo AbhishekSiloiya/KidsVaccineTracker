@@ -170,3 +170,6 @@ playwright-report/
 
 # Database
 instance/
+
+# Virtual Env
+.venv/
