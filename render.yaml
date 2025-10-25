@@ -3,5 +3,5 @@ services:
     name: kids-vaccine-tracker
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn main:app
     plan: free

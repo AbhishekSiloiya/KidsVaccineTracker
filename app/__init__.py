@@ -8,7 +8,12 @@ db = SQLAlchemy()
 
 def create_app():
     # Use package's own static directory (app/static) to avoid picking up outdated root-level duplicates
-    app = Flask(__name__, static_folder='static', static_url_path='/static', template_folder='template')
+    app = Flask(
+        __name__, 
+        static_folder=os.path.join(os.path.dirname(__file__), 'static'),
+        static_url_path='/static', 
+        template_folder=os.path.join(os.path.dirname(__file__), 'template')
+    )
     # Configuration sourced from environment variables with safe fallbacks
     # SECRET_KEY should ALWAYS be overridden in a real deployment
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-insecure-change-me')
