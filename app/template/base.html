@@ -27,10 +27,7 @@
                 },
             };
         </script>
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
-        />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
         <!-- Core Styles -->
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
         <link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}" />
@@ -39,69 +36,34 @@
         <meta name="description" content="Track your child's vaccination schedule with ease" />
         <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}" />
         <!-- Favicon -->
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
-        />
-        <link
-            rel="icon"
-            type="image/png"
-            sizes="192x192"
-            href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
-        />
-        <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}" />
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/VaxGuardLogo.png') }}" />
+        <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='images/VaxGuardLogo.png') }}" />
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/VaxGuardLogo.png') }}" />
         {% block extra_head %}{% endblock %}
     </head>
-    <body
-        class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen py-2 pb-14 font-['Inter',sans-serif] max-sm:py-2 max-sm:pb-8"
-    >
+    <body class="bg-gradient-to-br from-slate-50 to-indigo-100 max-sm:bg-slate-50 min-h-screen py-2 pb-14 font-['Inter',sans-serif] max-sm:py-2 max-sm:pb-8">
         <div class="mx-auto px-6">
             <!-- VaxGuard Header -->
             <div class="flex flex-col items-center justify-center mt-2 mb-6">
-                <a
-                    href="{{ url_for('views.add_child') }}"
-                    class="text-decoration-none hover:opacity-90 transition-opacity duration-200"
-                >
-                    <div
-                        class="flex flex-row items-center justify-center gap-4 mb-1 w-full max-w-lg max-sm:gap-2 max-sm:max-w-xs"
-                    >
-                        <img
-                            src="{{ url_for('static', filename='images/Logo/VaxGuardLogo.png') }}"
-                            alt="VaxGuard Logo"
-                            class="w-16 h-16 max-md:w-12 max-md:h-12 max-sm:w-10 max-sm:h-10"
-                        />
+                <a href="{{ url_for('views.add_child') }}" class="text-decoration-none hover:opacity-90 transition-opacity duration-200">
+                    <div class="flex flex-row items-center justify-center gap-4 mb-1 w-full max-w-lg max-sm:gap-2 max-sm:max-w-xs">
+                        <img src="{{ url_for('static', filename='images/VaxGuardLogo.png') }}" alt="VaxGuard Logo" class="w-16 h-16 max-md:w-12 max-md:h-12 max-sm:w-10 max-sm:h-10" />
                         <h2 class="text-5xl font-bold text-gray-800 max-md:text-3xl max-sm:text-2xl">VaxGuard</h2>
                     </div>
                 </a>
-                <p class="text-lg text-gray-700 text-center max-md:text-base max-sm:text-xs">
-                    Your child vaccination tracker and reminder
-                </p>
+                <p class="text-lg text-gray-700 text-center max-md:text-base max-sm:text-xs">Your child vaccination tracker and reminder</p>
             </div>
             <!-- Floating Action Button + Menu -->
-            <div
-                id="fabContainer"
-                class="fixed right-4 bottom-4 z-50 flex flex-col items-end max-md:right-3 max-md:bottom-3 max-sm:right-2 max-sm:bottom-2"
-            >
+            <div id="fabContainer" class="fixed right-4 bottom-4 z-50 flex flex-col items-end max-md:right-3 max-md:bottom-3 max-sm:right-2 max-sm:bottom-2">
                 <!-- Popup action list (reuses id=topActions for continuity) -->
-                <div
-                    id="topActions"
-                    class="hidden flex-col items-stretch gap-2 mb-2"
-                    role="menu"
-                    aria-label="Quick actions"
-                >
+                <div id="topActions" class="hidden flex-col items-stretch gap-2 mb-2" role="menu" aria-label="Quick actions">
                     <div class="flex flex-col gap-2">
                         <a
                             href="{{ url_for('views.dashboard') }}"
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                dashboard
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> dashboard </span>
                             <span class="font-semibold max-sm:hidden">Dashboard</span>
                         </a>
                         <a
@@ -109,11 +71,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                person_add
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> person_add </span>
                             <span class="font-semibold max-sm:hidden">Add Child</span>
                         </a>
                         <a
@@ -121,11 +79,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                compare
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> compare </span>
                             <span class="font-semibold max-sm:hidden">Compare Schedules</span>
                         </a>
                     </div>
@@ -137,11 +91,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                account_circle
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> account_circle </span>
                             <span class="font-semibold max-sm:hidden">Profile</span>
                         </a>
                         <a
@@ -149,11 +99,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                logout
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> logout </span>
                             <span class="font-semibold max-sm:hidden">Logout</span>
                         </a>
                     </div>
@@ -164,11 +110,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"
-                            >
-                                login
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-5xl max-sm:leading-none"> login </span>
                             <span class="font-semibold max-sm:hidden">Login</span>
                         </a>
                         <a
@@ -176,11 +118,7 @@
                             class="text-xl inline-flex items-center gap-4 bg-white text-gray-800 border border-gray-200 px-3 py-2 rounded-xl text-decoration-none min-w-[50px] shadow-md transition-all duration-150 ease-in-out backdrop-blur-sm hover:shadow-lg hover:bg-slate-50 max-md:text-base max-md:px-2 max-md:py-2 max-sm:px-3 max-sm:justify-center max-sm:rounded-xl"
                             role="menuitem"
                         >
-                            <span
-                                class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"
-                            >
-                                how_to_reg
-                            </span>
+                            <span class="material-symbols-outlined text-2xl text-indigo-600 max-md:text-xl max-sm:text-xl max-sm:leading-none"> how_to_reg </span>
                             <span class="font-semibold max-sm:hidden">Register</span>
                         </a>
                     </div>
@@ -194,19 +132,13 @@
                     aria-controls="topActions"
                     title="Quick actions"
                 >
-                    <span id="fabIcon" class="material-symbols-outlined text-3xl max-md:text-2xl max-sm:text-2xl">
-                        add
-                    </span>
+                    <span id="fabIcon" class="material-symbols-outlined text-3xl max-md:text-2xl max-sm:text-2xl"> add </span>
                 </button>
             </div>
 
             <!-- Header -->
             <header class="text-center mb-8 max-md:mb-3">
-                <h1
-                    class="text-5xl font-bold text-gray-800 mb-4 max-md:text-4xl max-md:leading-tight max-md:mb-1 max-sm:text-3xl max-sm:mb-3 max-sm:leading-tight"
-                >
-                    Child Vaccination Tracker
-                </h1>
+                <h1 class="text-5xl font-bold text-gray-800 mb-4 max-md:text-4xl max-md:leading-tight max-md:mb-1 max-sm:text-3xl max-sm:mb-3 max-sm:leading-tight">Child Vaccination Tracker</h1>
             </header>
 
             {% block content %}{% endblock %}

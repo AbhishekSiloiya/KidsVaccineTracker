@@ -130,31 +130,6 @@ jobs:
           name: flask-app-build
           path: flask-app-v${{ github.run_number }}.tar.gz
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: flask-app-build
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ github.run_number }}
-          name: Flask App v${{ github.run_number }}
-          body: |
-            Automated Flask application release.
-
-            - Python versions tested: 3.10, 3.11, 3.12
-            - Lint & security scans executed
-            - Artifact packaged (tar.gz)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   notify:
     name: Notify
     runs-on: ubuntu-latest
