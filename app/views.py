@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, Response, session, flash
 from datetime import date, datetime, timedelta, timezone
+from io import BytesIO
+from zoneinfo import ZoneInfo
 from .models import Child, Vaccination, Parent
 from . import db
 from .schedule_data import build_schedule_for_child, get_reference_url, get_countries
@@ -88,6 +90,216 @@ def home():
 
 def base_template():  # Optional helper
     return render_template('base.html')
+
+
+def _uk_today() -> date:
+    try:
+        return datetime.now(ZoneInfo('Europe/London')).date()
+    except Exception:
+        return date.today()
+
+
+def _format_pdf_date(value) -> str:
+    if not value:
+        return '—'
+    if isinstance(value, datetime):
+        value = value.date()
+    return value.strftime('%d %b %Y')
+
+
+def _build_vaccine_record_rows(vaccinations, today: date):
+    rows = []
+    for vac in vaccinations:
+        if vac.completed_at:
+            status = 'Completed'
+            display_date = _format_pdf_date(vac.completed_at)
+        elif not vac.due_date:
+            status = 'Due'
+            display_date = '—'
+        elif vac.due_date <= today:
+            status = 'Overdue'
+            display_date = _format_pdf_date(vac.due_date)
+        else:
+            status = 'Due'
+            display_date = _format_pdf_date(vac.due_date)
+        rows.append({
+            'vaccine': vac.name,
+            'status': status,
+            'date': display_date,
+        })
+    return rows
+
+
+def _build_grouped_vaccine_record_rows(schedule_entries, vaccinations, today: date):
+    vac_by_name = {v.name: v for v in vaccinations}
+    seen = set()
+    groups = []
+
+    for entry in schedule_entries or []:
+        age_label = entry.get('age') or 'Schedule'
+        group_rows = []
+        for vac_name in entry.get('vaccines') or []:
+            vac = vac_by_name.get(vac_name)
+            if not vac:
+                # Keep schedule completeness even if DB row doesn't exist yet.
+                due_date = entry.get('due_date')
+
+                class _TempVac:
+                    def __init__(self, name, due_date):
+                        self.name = name
+                        self.due_date = due_date
+                        self.completed_at = None
+
+                vac = _TempVac(vac_name, due_date)
+            row = _build_vaccine_record_rows([vac], today)[0]
+            group_rows.append(row)
+            seen.add(vac_name)
+        if group_rows:
+            groups.append({'age': age_label, 'rows': group_rows})
+
+    leftover = [v for v in vaccinations if v.name not in seen]
+    if leftover:
+        leftover_rows = _build_vaccine_record_rows(leftover, today)
+        groups.append({'age': 'Other', 'rows': leftover_rows})
+
+    return groups
+
+
+def _name_initials(name: str) -> str:
+    parts = [p for p in (name or '').split() if p]
+    if not parts:
+        return 'CH'
+    initials = ''.join(part[0] for part in parts if part and part[0].isalpha()).upper()
+    return initials or 'CH'
+
+
+def _escape_pdf_text(text: str) -> str:
+    safe = (text or '').replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+    return safe.encode('latin-1', errors='replace').decode('latin-1')
+
+
+def _pdf_text(x: int, y: int, text: str, font: str = 'F1', size: int = 10, color=(0, 0, 0)) -> str:
+    r, g, b = color
+    return f"BT {r:.3f} {g:.3f} {b:.3f} rg /{font} {size} Tf {x} {y} Td ({_escape_pdf_text(text)}) Tj ET"
+
+
+def _status_color(status: str):
+    if status == 'Completed':
+        return (0.020, 0.588, 0.412)
+    if status == 'Overdue':
+        return (0.863, 0.149, 0.149)
+    return (0.851, 0.467, 0.024)
+
+
+def _build_vaccine_record_stats(vaccinations, today: date):
+    due_soon_window = today + timedelta(days=30)
+    completed = sum(1 for v in vaccinations if v.completed_at)
+    overdue = sum(1 for v in vaccinations if (not v.completed_at) and v.due_date and v.due_date <= today)
+    due_soon = sum(1 for v in vaccinations if (not v.completed_at) and v.due_date and today < v.due_date <= due_soon_window)
+    return {
+        'completed': completed,
+        'overdue': overdue,
+        'due_soon': due_soon,
+        'total': len(vaccinations),
+    }
+
+
+def _build_vaccine_record_pdf(groups, generated_on: date, child_name: str, parent_name: str, stats) -> bytes:
+    table_items = []
+
+    for group in groups or []:
+        table_items.append({'kind': 'group', 'label': group.get('age') or 'Schedule'})
+        for row in group.get('rows') or []:
+            table_items.append({'kind': 'row', 'row': row})
+
+    instructions = []
+    page_cmds = []
+    page_cmds.append(_pdf_text(42, 805, 'Vaccination Record', font='F2', size=18))
+    page_cmds.append(_pdf_text(465, 805, 'VaxGuard', font='F2', size=12, color=(0.145, 0.388, 0.922)))
+    page_cmds.append(_pdf_text(42, 786, f"Generated on: {_format_pdf_date(generated_on)}"))
+    page_cmds.append(_pdf_text(42, 770, f"Child: {child_name}"))
+    page_cmds.append(_pdf_text(42, 754, f"Parent: {parent_name}"))
+    page_cmds.append(_pdf_text(42, 734, f"Overdue: {stats['overdue']}", font='F2', size=10, color=(0.863, 0.149, 0.149)))
+    page_cmds.append(_pdf_text(170, 734, f"Due Soon: {stats['due_soon']}", font='F2', size=10, color=(0.851, 0.467, 0.024)))
+    page_cmds.append(_pdf_text(312, 734, f"Complete: {stats['completed']}/{stats['total']}", font='F2', size=10, color=(0.020, 0.588, 0.412)))
+
+    if table_items:
+        page_cmds.append(_pdf_text(42, 714, 'Vaccine', font='F2', size=9))
+        page_cmds.append(_pdf_text(375, 714, 'Status', font='F2', size=9))
+        page_cmds.append(_pdf_text(462, 714, 'Date', font='F2', size=9))
+        y = 699
+        for item in table_items:
+            if y < 94:
+                break
+            if item['kind'] == 'group':
+                page_cmds.append(_pdf_text(42, y, item['label'], font='F2', size=8, color=(0.122, 0.161, 0.235)))
+                y -= 11
+                continue
+            row = item['row']
+            color = _status_color(row['status'])
+            page_cmds.append(_pdf_text(54, y, (row['vaccine'] or '')[:56], font='F1', size=8))
+            page_cmds.append(_pdf_text(375, y, row['status'], font='F2', size=8, color=color))
+            page_cmds.append(_pdf_text(462, y, row['date'], font='F2', size=8, color=color))
+            y -= 11
+    else:
+        page_cmds.append(_pdf_text(42, 697, 'No vaccination schedule available.', font='F1', size=11))
+
+    page_cmds.append(_pdf_text(42, 78, 'Due = upcoming based on schedule', size=9))
+    page_cmds.append(_pdf_text(42, 64, 'Overdue = past scheduled date', size=9))
+    page_cmds.append(_pdf_text(42, 32, 'VaxGuard', size=8))
+    page_cmds.append(_pdf_text(470, 32, 'Page 1 of 1', size=8))
+    instructions.append('\n'.join(page_cmds))
+
+    objects = []
+
+    def _add_object(content: str) -> int:
+        objects.append(content)
+        return len(objects)
+
+    font_regular_id = _add_object("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+    font_bold_id = _add_object("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>")
+    page_ids = []
+    pages_id = _add_object("")
+    catalog_id = _add_object("")
+
+    for cmd in instructions:
+        stream_bytes = cmd.encode('latin-1', errors='replace')
+        stream = stream_bytes.decode('latin-1')
+        content_id = _add_object(f"<< /Length {len(stream_bytes)} >>\nstream\n{stream}\nendstream")
+        page_id = _add_object(
+            "<< /Type /Page "
+            f"/Parent {pages_id} 0 R "
+            "/MediaBox [0 0 595 842] "
+            f"/Contents {content_id} 0 R "
+            "/Resources << /Font << "
+            f"/F1 {font_regular_id} 0 R "
+            f"/F2 {font_bold_id} 0 R "
+            ">> >> >>"
+        )
+        page_ids.append(page_id)
+
+    kids_refs = ' '.join(f"{pid} 0 R" for pid in page_ids)
+    objects[pages_id - 1] = f"<< /Type /Pages /Count {len(page_ids)} /Kids [ {kids_refs} ] >>"
+    objects[catalog_id - 1] = f"<< /Type /Catalog /Pages {pages_id} 0 R >>"
+
+    output = BytesIO()
+    output.write(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+    offsets = [0]
+    for i, content in enumerate(objects, start=1):
+        offsets.append(output.tell())
+        output.write(f"{i} 0 obj\n{content}\nendobj\n".encode('latin-1', errors='replace'))
+    xref_pos = output.tell()
+    output.write(f"xref\n0 {len(objects) + 1}\n".encode('latin-1'))
+    output.write(b"0000000000 65535 f \n")
+    for off in offsets[1:]:
+        output.write(f"{off:010d} 00000 n \n".encode('latin-1'))
+    output.write(
+        (
+            f"trailer\n<< /Size {len(objects) + 1} /Root {catalog_id} 0 R >>\n"
+            f"startxref\n{xref_pos}\n%%EOF\n"
+        ).encode('latin-1')
+    )
+    return output.getvalue()
 
 def _validate_child_form(name: str, dob_str: str, country: str | None = None):
     errors = []
@@ -437,7 +649,7 @@ def download_child_calendar(child_id):
     schedule_entries = build_schedule_for_child(child.dob, child=child)
     # Build ICS content
     def esc(val: str) -> str:
-        return val.replace(',', '\,').replace('\n', '\n').replace(';', '\;')
+        return val.replace(',', '\\,').replace('\n', '\\n').replace(';', '\\;')
 
     lines = [
         'BEGIN:VCALENDAR',
@@ -474,6 +686,39 @@ def download_child_calendar(child_id):
         mimetype='text/calendar',
         headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
+
+
+@views.route('/child/<int:child_id>/vaccine-record.pdf')
+def download_vaccine_record_pdf(child_id):
+    parent_id = session.get('parent_id')
+    if not parent_id:
+        flash('Please log in first.', 'error')
+        return redirect(url_for('auth.login'))
+    child = Child.query.filter_by(id=child_id, parent_id=parent_id).first_or_404()
+
+    try:
+        schedule_entries = build_schedule_for_child(child.dob, child=child, country=child.country or 'India')
+        vaccinations = Vaccination.query.filter_by(child_id=child.id).order_by(
+            Vaccination.due_date.asc(),
+            Vaccination.name.asc(),
+        ).all()
+
+        generated_on = _uk_today()
+        initials = _name_initials(child.name)
+        filename = f"{initials}_vaxguard_vaccine_record_{generated_on.strftime('%Y-%m-%d')}.pdf"
+        grouped_rows = _build_grouped_vaccine_record_rows(schedule_entries, vaccinations, generated_on)
+        stats = _build_vaccine_record_stats(vaccinations, generated_on)
+        parent_name = child.parent.name if child.parent and child.parent.name else 'Parent'
+        pdf_bytes = _build_vaccine_record_pdf(grouped_rows, generated_on, child.name or 'Child', parent_name, stats)
+
+        return Response(
+            pdf_bytes,
+            mimetype='application/pdf',
+            headers={'Content-Disposition': f'attachment; filename={filename}'},
+        )
+    except Exception:
+        flash("Couldn't generate PDF. Try again.", 'error')
+        return redirect(url_for('views.child_view', child_id=child.id))
 
 
 @views.route('/child/<int:child_id>/update', methods=['POST'])
