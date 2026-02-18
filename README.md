@@ -1,6 +1,6 @@
 # VaccinationTracker (Flask Edition)
 
-Track children's vaccination schedules (IAP 2024 – India) with a Flask backend, server‑side persistence, auth, schedule computation, and calendar export.
+Track children's vaccination schedules (multi-country schedule support) with a Flask backend, server-side persistence, auth, schedule computation, calendar export, and downloadable vaccination-record PDFs.
 
 ## ✨ Features
 
@@ -10,8 +10,14 @@ Track children's vaccination schedules (IAP 2024 – India) with a Flask backend
 - Status tracking: Upcoming / Due (incl. due today) / Completed
 - Group completion per age milestone
 - Dashboard stats: overdue, due soon (≤30 days), upcoming
+- Vaccination Record PDF download from Child Profile
+  - grouped by schedule milestones (e.g. 8 Weeks, 12 Weeks)
+  - top summary stats (Overdue / Due Soon / Complete)
+  - status/date traffic-light coloring
+  - child initials in filename and child/parent names in header
 - ICS calendar export (aggregate events)
 - Responsive UI (Tailwind CDN + semantic `vt-` classes)
+- Desktop Child Profile top panel optimized to compact 3-row actions layout
 - PWA basics: `manifest.json`, `sw.js` (offline shell)
 - Consistent date formatting via Jinja filters
 
@@ -78,8 +84,9 @@ tests/
 	test_schedule.py # schedule & status logic
 	test_models.py   # relationships & cascade delete
 	test_auth.py     # register/login
+	test_vaccine_record_pdf.py # PDF auth, logic, grouping, stats
 ```
-Planned: dashboard stats, completion endpoint, negative auth cases.
+Current local suite status: `27 passed`.
 
 ## 📦 CI/CD
 
@@ -88,7 +95,8 @@ GitHub Actions (`.github/workflows/ci.yml`):
 2. Lint (flake8)
 3. Security (bandit + safety)
 4. Build artifact (main)
-5. Release publish (main)
+
+Note: GitHub Release entries are not auto-created by the current workflow.
 
 ## 🗄 Database
 
@@ -106,15 +114,23 @@ GitHub Actions (`.github/workflows/ci.yml`):
 
 ICS file groups events by age band (one event containing multiple vaccines) for cleaner calendar views.
 
+## 📄 Vaccine Record PDF
+
+From Child Profile, users can download a vaccination-record PDF that includes:
+- generated date + parent/child identity header
+- grouped schedule sections by age milestone
+- status/date with traffic-light colors
+- quick top stats (Overdue, Due Soon, Complete/Total)
+- compact single-page output for current MVP scope
+
 ## 🧱 Project Structure (excerpt)
 
 ```
 app/               # Flask app package (models, views, schedule_data)
-templates/         # Jinja2 templates
-static/css/        # style.css, responsive.css
-manifest.json      # PWA manifest
-sw.js              # service worker
+app/template/      # Jinja2 templates
+app/static/css/    # stylesheet assets
 tests/             # pytest suite
+docs/              # release notes + QA docs
 requirements.txt   # pinned dependencies
 main.py            # entry point (create_app wrapper)
 ```
