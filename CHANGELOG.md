@@ -14,7 +14,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change the Overdue/Due Soon/Completed to be filters
 
 ### Added
+- Child Profile CTA to download a Vaccination Record PDF.
+- New PDF route: `/child/<id>/vaccine-record.pdf` with authenticated child ownership checks.
+- File naming with child initials prefix: `<INITIALS>_vaxguard_vaccine_record_<YYYY-MM-DD>.pdf`.
+- Child and parent identity lines in PDF header.
+- Grouped vaccine sections in PDF by schedule milestones (for example: `8 Weeks`, `12 Weeks`).
+- Top summary stats in PDF: `Overdue`, `Due Soon`, `Complete/Total`.
+- Dedicated PDF test coverage in `tests/test_vaccine_record_pdf.py`.
+
 - ✅ A Flask Webapp
+
+### Changed
+- Child Profile desktop top panel redesigned to a compact three-row layout:
+  - identity row
+  - status row
+  - action row
+- Desktop visual scale reduced to match reference mock while preserving mobile layout behavior.
+- Vaccine Record PDF row rendering now color-codes `Status` and `Date` only.
+- PDF date behavior aligned to website logic:
+  - completed vaccines show completion date
+  - due/overdue vaccines show due date
+- Vaccine Record PDF now renders as a compact single-page output for current MVP scope.
+
+### Fixed
+- Removed Dose column from vaccine PDF after placeholder rendering ambiguity.
+- Corrected desktop panel width alignment with schedule cards.
+- Corrected PDF grouping route wiring to avoid generation fallback redirects.
 
 ## [2.0.0] - 13/08/2025
 ### Changed

@@ -1,30 +1,68 @@
 {% extends 'base.html' %} {% block title %}Child Profile - VaccinationTracker{% endblock %} {% block content %}
-<div class="bg-white rounded-xl shadow-sm transition-shadow duration-300 hover:shadow-lg p-8 max-w-[800px] mx-auto mb-6 relative max-md:p-3 max-md:mx-1 max-md:mb-3 max-md:rounded-lg max-md:shadow-none max-md:border max-md:border-gray-200 max-sm:p-3 max-sm:mx-0.5 max-sm:mb-2 lg:p-10">
+<div class="bg-white rounded-xl md:rounded-[18px] shadow-sm transition-shadow duration-300 hover:shadow-lg p-8 md:p-0 max-w-[800px] mx-auto mb-6 relative max-md:p-3 max-md:mx-1 max-md:mb-3 max-md:rounded-lg max-md:shadow-none max-md:border max-md:border-gray-200 max-sm:p-3 max-sm:mx-0.5 max-sm:mb-2">
     {% if child %}
-    <div class="flex flex-col gap-4" x-data="{editing: false}">
+    <div class="flex flex-col gap-4 md:gap-0" x-data="{editing: false}">
         <span id="editMeta" data-open-edit="{% if editing %}1{% else %}0{% endif %}" class="hidden"></span>
-        <div class="flex flex-col justify-center items-center gap-2">
+        <div class="order-1 md:order-1 flex flex-col justify-center items-center gap-2 md:gap-2 md:pt-7 md:pb-6 md:px-8">
             <p class="text-3xl font-semibold text-gray-800 max-sm:text-2xl max-sm:leading-8">{{ child.name }}</p>
-            <p class="text-xl text-gray-700 max-sm:text-lg max-sm:leading-5">Born on: {{ child.dob|short_date }}</p>
-            <p class="text-xl text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full max-sm:text-lg max-sm:leading-5">{{ child.dob|age_text }}</p>
-            <p class="text-sm text-gray-600">Country: <span class="font-medium text-gray-600">{{ child.country or 'India' }}</span></p>
+            <p class="text-xl text-gray-700 max-sm:text-lg max-sm:leading-5 md:text-[14px]">Born on: {{ child.dob|short_date }}</p>
+            <div class="hidden md:flex md:items-center md:gap-5 text-sm text-gray-600">
+                <p class="text-indigo-600 bg-indigo-100 border border-indigo-200 px-[14px] py-1 rounded-full font-semibold text-[13px]">{{ child.dob|age_text }}</p>
+                <span class="text-gray-300">•</span>
+                <p class="text-gray-600 text-[13px]">
+                    <span class="material-symbols-outlined align-middle text-[1em] mr-1">public</span>{{ child.country or 'India' }}
+                </p>
+                {% if reference_url %}
+                <span class="text-gray-300">•</span>
+                <a
+                    href="{{ reference_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-600 hover:underline text-[13px] font-semibold"
+                >
+                    Official schedule
+                </a>
+                {% endif %}
+            </div>
+            <p class="text-xl text-indigo-500 bg-indigo-100 px-3 py-1 rounded-full max-sm:text-lg max-sm:leading-5 md:hidden">{{ child.dob|age_text }}</p>
+            <p class="text-sm text-gray-600 md:hidden">Country: <span class="font-medium text-gray-600">{{ child.country or 'India' }}</span></p>
             {% if reference_url %}
             <a
                 href="{{ reference_url }}"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-sm text-blue-600 hover:underline"
+                class="text-sm text-blue-600 hover:underline md:hidden"
             >
                 Official schedule for {{ child.country or current_country or 'India' }}
             </a>
             {% endif %}
         </div>
-        <div class="flex flex-col gap-2 w-full">
+        <div class="order-2 md:order-3 flex flex-col gap-2 w-full md:grid md:grid-cols-2 md:gap-3 md:px-8 md:py-4 md:border-t md:border-gray-200">
+            {% if guest_mode %}
+            <a
+                href="{{ url_for('auth.login') }}?message=download_vaccine_record"
+                id="downloadVaccineRecordPdfBtn"
+                class="w-full bg-blue-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2 md:text-[14px] md:py-[11px] md:px-4 md:rounded-[10px] md:leading-tight md:font-semibold"
+            >
+                <span class="material-symbols-outlined">description</span>
+                Download Vaccine Record (PDF)
+            </a>
+            {% else %}
+            <a
+                href="{{ url_for('views.download_vaccine_record_pdf', child_id=child.id) }}"
+                id="downloadVaccineRecordPdfBtn"
+                class="w-full bg-blue-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2 md:text-[14px] md:py-[11px] md:px-4 md:rounded-[10px] md:leading-tight md:font-semibold"
+                download
+            >
+                <span class="material-symbols-outlined">description</span>
+                Download Vaccine Record (PDF)
+            </a>
+            {% endif %}
             {% if guest_mode %}
             <a
                 href="{{ url_for('auth.login') }}?message=download_calendar"
                 id="downloadCalendarBtn"
-                class="w-full bg-indigo-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2"
+                class="w-full bg-indigo-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2 md:text-[14px] md:py-[11px] md:px-4 md:rounded-[10px] md:leading-tight md:font-semibold"
             >
                 <span class="material-symbols-outlined">calendar_apps_script</span>
                 Download Calendar
@@ -33,32 +71,35 @@
             <a
                 href="{{ url_for('views.download_child_calendar', child_id=child.id) }}"
                 id="downloadCalendarBtn"
-                class="w-full bg-indigo-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2"
+                class="w-full bg-indigo-600 text-xl text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition duration-200 ease-in-out transform hover:scale-105 shadow-md flex items-center justify-center gap-3 max-sm:text-base max-sm:py-2 md:text-[14px] md:py-[11px] md:px-4 md:rounded-[10px] md:leading-tight md:font-semibold"
                 download
             >
                 <span class="material-symbols-outlined">calendar_apps_script</span>
                 Download Calendar
             </a>
             {% endif %}
-            <div class="flex flex-wrap items-center justify-between gap-3 mt-1">
+        </div>
+        <div class="order-3 md:order-2 flex flex-wrap items-center justify-between gap-3 mt-1 md:mt-0 md:px-8 md:py-[14px] md:border-t md:border-b md:border-gray-200 md:bg-gray-50">
+            <div class="flex items-center gap-4 md:gap-6">
+                <p class="hidden md:block text-gray-400 text-[11px] tracking-[0.7px] font-semibold uppercase">Status</p>
                 <div class="flex flex-wrap gap-2 max-sm:gap-1">
                     {% if stats and stats.total is defined %}
                     <button
-                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-red-600 bg-red-50 border-[1px] border-red-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-red-200 transition-colors duration-200"
+                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-red-600 bg-red-50 border-[1px] border-red-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-red-200 transition-colors duration-200 md:text-[13px] md:px-[14px] md:py-[5px] md:border-[1.5px]"
                         data-filter="overdue"
                         data-default-classes="text-red-600 bg-red-50 border-red-500"
                         data-active-classes="text-white bg-red-600 border-red-700"
                         >{{ stats.overdue }} Overdue</button
                     >
                     <button
-                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border-[1px] border-yellow-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-yellow-200 transition-colors duration-200"
+                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-yellow-600 bg-yellow-50 border-[1px] border-yellow-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-yellow-200 transition-colors duration-200 md:text-[13px] md:px-[14px] md:py-[5px] md:border-[1.5px]"
                         data-filter="upcoming"
                         data-default-classes="text-yellow-600 bg-yellow-50 border-yellow-500"
                         data-active-classes="text-white bg-yellow-600 border-yellow-700"
                         >{{ stats.due_soon }} Due Soon</button
                     >
                     <button
-                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-green-600 bg-green-50 border-[1px] border-green-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-green-200 transition-colors duration-200"
+                        class="filter-pill inline-block px-3 py-1 text-sm font-medium text-green-600 bg-green-50 border-[1px] border-green-500 rounded-full max-sm:px-2 max-sm:py-1.5 max-sm:text-xs max-sm:leading-3 cursor-pointer hover:bg-green-200 transition-colors duration-200 md:text-[13px] md:px-[14px] md:py-[5px] md:border-[1.5px]"
                         data-filter="completed"
                         data-default-classes="text-green-600 bg-green-50 border-green-500"
                         data-active-classes="text-white bg-green-600 border-green-700"
@@ -73,15 +114,15 @@
                     > -->
                     {% endif %}
                 </div>
-                <button
-                    id="editChildBtn"
-                    type="button"
-                    class="text-gray-600 p-3 rounded-full hover:bg-gray-100 transition duration-200 ease-in-out flex !flex-row items-center justify-center gap-2 text-sm shadow-md max-sm:gap-0 max-sm:ml-auto max-sm:p-2"
-                >
-                    <span class="material-symbols-outlined">edit_calendar</span>
-                    <span class="inline">Edit Child</span>
-                </button>
             </div>
+            <button
+                id="editChildBtn"
+                type="button"
+                class="text-gray-600 p-3 rounded-full hover:bg-gray-100 transition duration-200 ease-in-out flex !flex-row items-center justify-center gap-2 text-sm shadow-md max-sm:gap-0 max-sm:ml-auto max-sm:p-2 md:px-[14px] md:py-[6px] md:rounded-lg md:border md:border-gray-200 md:shadow-none md:text-[13px] md:text-gray-500 md:hover:bg-gray-50"
+            >
+                <span class="material-symbols-outlined">edit_calendar</span>
+                <span class="inline">Edit Child</span>
+            </button>
         </div>
         <div id="editFormContainer" class="hidden mt-4">
             <form
